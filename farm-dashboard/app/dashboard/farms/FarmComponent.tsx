@@ -1,6 +1,11 @@
 'use client'
+
+import FarmCreationDialog from "@/components/dashboard/farm-create-dialog"
+
 export default function FarmPage() {
     return (
-        <div>farm page</div>
+        <>
+            <FarmCreationDialog />
+        </>
     )
 }
