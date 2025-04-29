@@ -6,6 +6,7 @@ from rest_framework.generics import ListAPIView
 from .serializers import FarmSerializer,FarmListSerializer
 from .models import Farm
 from helper.custom_pagination import CustomPageNumberPagination
+from rest_framework.generics import RetrieveAPIView
 class FarmCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -28,3 +29,9 @@ class FarmListView(ListAPIView):
     serializer_class = FarmListSerializer
     queryset = Farm.objects.all()
     pagination_class = CustomPageNumberPagination
+
+
+class FarmRetrieveView(RetrieveAPIView):
+    queryset = Farm.objects.all()
+    serializer_class = FarmSerializer
+    lookup_field = 'id'

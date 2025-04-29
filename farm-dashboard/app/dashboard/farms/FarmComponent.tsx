@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
 
 type PaginatedFarmsResponse = {
     count: number
@@ -70,7 +71,7 @@ export default function FarmPage() {
                                     <CardHeader className="bg-gradient-to-r from-green-100 to-green-50 pb-2">
                                         <div className="flex items-center gap-2">
                                             <div className="bg-green-600 p-2 rounded-full">
-                                                <FarmIcon className="h-5 w-5 text-white" />
+                                                <Image src={farm.image} height={40} width={40} className='rounded-full' alt='alt' />
                                             </div>
                                             <CardTitle className="text-xl text-green-800">{customFarm.name}</CardTitle>
                                         </div>
