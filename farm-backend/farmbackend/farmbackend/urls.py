@@ -20,5 +20,5 @@ from django.urls import path,include
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('user.urls')),  # 🔥 This line loads your app's urls
-
+    path('farm/',include('farm.urls'))
 ]

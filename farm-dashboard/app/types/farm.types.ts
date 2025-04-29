@@ -7,4 +7,5 @@ export interface Farm {
     createdAt: string; // ISO date string
     updatedAt: string; // ISO date string
     description: string;
+    image: string
 }

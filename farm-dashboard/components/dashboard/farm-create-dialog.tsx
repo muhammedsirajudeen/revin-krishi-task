@@ -1,38 +1,75 @@
 import { useState } from 'react';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import {
+    Dialog, DialogTrigger, DialogContent,
+    DialogHeader, DialogFooter
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import axiosInstance from '@/app/helper/axiosInstance';
+import { toast } from 'sonner';
+import { ToastStyles } from '@/lib/utils';
 
 // Validation Schema
 const farmSchema = z.object({
     name: z.string().min(1, 'Farm name is required'),
     location: z.string().min(1, 'Location is required'),
-    sizeInAcres: z.number().min(1, 'Size in acres must be greater than 0').optional(),
+    sizeInAcres: z.string().min(1, 'Size in acres must be greater than 0').optional(),
     description: z.string().min(1, 'Description is required'),
+    image: z.instanceof(File).refine(file => file.size > 0, {
+        message: 'Image is required',
+    }),
 });
 
 type FarmFormData = z.infer<typeof farmSchema>;
 
 const FarmCreationDialog = () => {
     const [isOpen, setIsOpen] = useState(false);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
 
-    // Provide initial default values to ensure controlled input behavior
-    const { control, handleSubmit, formState: { errors }, reset } = useForm<FarmFormData>({
+    const {
+        control,
+        handleSubmit,
+        formState: { errors },
+        reset
+    } = useForm<FarmFormData>({
         resolver: zodResolver(farmSchema),
         defaultValues: {
             name: '',
             location: '',
             sizeInAcres: undefined,
             description: '',
+            image: undefined,
         },
     });
 
-    const onSubmit = (data: FarmFormData) => {
+    const onSubmit = async (data: FarmFormData) => {
         console.log('Farm Created: ', data);
-        reset(); // Clear form after submission
-        setIsOpen(false); // Close the dialog
+        try {
+            const formData = new FormData();
+            formData.append('name', data.name);
+            formData.append('location', data.location);
+            formData.append('sizeInAcres', data.sizeInAcres?.toString() ?? '');
+            formData.append('description', data.description);
+            formData.append('image', data.image);
+
+            const response = await axiosInstance.post('/farm/create-farm', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+
+            console.log('Response:', response.data);
+            toast.success('Farm created successfully', ToastStyles.success)
+        } catch (error) {
+            console.error('Error creating farm:', error);
+            toast.error('Error in creating farm', ToastStyles.error)
+        } finally {
+            reset();
+            setIsOpen(false);
+            setImagePreview(null);
+        }
     };
 
     return (
@@ -88,8 +125,8 @@ const FarmCreationDialog = () => {
                                 render={({ field }) => (
                                     <input
                                         id="sizeInAcres"
-                                        {...field}
                                         type="number"
+                                        {...field}
                                         placeholder="Size in Acres"
                                         className="mt-1 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     />
@@ -113,6 +150,39 @@ const FarmCreationDialog = () => {
                                 )}
                             />
                             {errors.description && <p className="text-sm text-red-600 mt-1">{errors.description.message}</p>}
+                        </div>
+
+                        <div>
+                            <label htmlFor="image" className="block text-sm font-medium text-gray-700">Farm Image</label>
+                            <Controller
+                                name="image"
+                                control={control}
+                                render={({ field }) => (
+                                    <input
+                                        id="image"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => {
+                                            const file = e.target.files?.[0];
+                                            if (file) {
+                                                field.onChange(file); // set file to RHF
+                                                const reader = new FileReader();
+                                                reader.onloadend = () => {
+                                                    setImagePreview(reader.result as string);
+                                                };
+                                                reader.readAsDataURL(file);
+                                            }
+                                        }}
+                                        className="mt-1 p-2 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    />
+                                )}
+                            />
+                            {imagePreview && (
+                                <div className="mt-2 w-full flex justify-center">
+                                    <img src={imagePreview} alt="Farm Preview" className="w-32 h-32 rounded-md shadow-md" />
+                                </div>
+                            )}
+                            {errors.image && <p className="text-sm text-red-600 mt-1">{errors.image.message}</p>}
                         </div>
 
                         <DialogFooter className="flex justify-between">

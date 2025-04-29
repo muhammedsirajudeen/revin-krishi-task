@@ -7,9 +7,8 @@ class Farm(models.Model):
     location = models.CharField(max_length=255)
     owner = models.ForeignKey('user.CustomUser', on_delete=models.CASCADE)
     size_in_acres = models.FloatField(null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
     description = models.TextField()
+    image = models.FileField(upload_to='images/')  # Store in 'media/documents/'
 
     def __str__(self):
         return self.name
