@@ -2,30 +2,40 @@
 
 import { useState } from 'react'
 import useSWR from 'swr'
-import { Leaf, MapPin, Tractor, Wheat, ChevronDown, Loader2 } from 'lucide-react'
+import { Leaf, MapPin, Tractor, Wheat, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 
 import FarmCreationDialog from "@/components/dashboard/farm-create-dialog"
-import { CamelCaseToSnakeCase, fetcher, SnakeCaseToCamelCase } from '@/lib/utils'
+import { CamelCaseToSnakeCase, fetcher } from '@/lib/utils'
 import { Farm } from '@/app/types/farm.types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import camelcase from 'camelcase';
+import { useRouter } from 'next/navigation'
+
+type PaginatedFarmsResponse = {
+    count: number
+    next: string | null
+    previous: string | null
+    results: Farm[]
+}
 
 export default function FarmPage() {
     const [page, setPage] = useState(1)
     const PAGE_SIZE = 6
-
-    const { data, isLoading }: { data: Farm[], isLoading: boolean } = useSWR(
+    const router = useRouter()
+    const { data, isLoading } = useSWR<PaginatedFarmsResponse>(
         `/farm/list?page=${page}&limit=${PAGE_SIZE}`,
         fetcher
     )
 
     const handleNextPage = () => {
-        setPage(prev => prev + 1)
+        if (data?.next) setPage(prev => prev + 1)
     }
 
-    // Function to determine which icon to show based on farm name
+    const handlePrevPage = () => {
+        if (data?.previous && page > 1) setPage(prev => prev - 1)
+    }
+
     const getFarmIcon = (farmName: string) => {
         const name = farmName.toLowerCase()
         if (name.includes('wheat') || name.includes('grain')) return Wheat
@@ -52,7 +62,7 @@ export default function FarmPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {data?.map((farm) => {
+                        {data?.results.map((farm) => {
                             const FarmIcon = getFarmIcon(farm.name)
                             const customFarm = farm as unknown as CamelCaseToSnakeCase<Farm>
                             return (
@@ -81,7 +91,9 @@ export default function FarmPage() {
                                         <Badge variant="outline" className="bg-amber-50 text-amber-700 border-amber-200">
                                             {customFarm.size_in_acres ? (customFarm.size_in_acres > 50 ? "Large Farm" : "Small Farm") : "Unknown Size"}
                                         </Badge>
-                                        <Button variant="ghost" size="sm" className="text-green-700 hover:text-green-800 hover:bg-green-100">
+                                        <Button onClick={() => {
+                                            router.push(`/dashboard/farms/${customFarm.id}`)
+                                        }} variant="ghost" size="sm" className="text-green-700 hover:text-green-800 hover:bg-green-100">
                                             View Details
                                         </Button>
                                     </CardFooter>
@@ -92,7 +104,7 @@ export default function FarmPage() {
                 )}
 
                 {/* Empty State */}
-                {data?.length === 0 && (
+                {data?.results?.length === 0 && (
                     <div className="flex flex-col items-center justify-center h-64 bg-green-50/50 rounded-xl border border-green-100 p-6">
                         <Wheat className="h-16 w-16 text-green-300 mb-4" />
                         <h3 className="text-xl font-semibold text-green-800">No Farms Yet</h3>
@@ -102,11 +114,20 @@ export default function FarmPage() {
                     </div>
                 )}
 
-                {/* Pagination */}
-                <div className="flex justify-center pt-6">
+                {/* Pagination Controls */}
+                <div className="flex justify-center items-center gap-4 pt-6">
+                    <Button
+                        onClick={handlePrevPage}
+                        disabled={!data?.previous || page === 1 || isLoading}
+                        className="bg-green-100 text-green-700 hover:bg-green-200"
+                    >
+                        <ChevronUp className="mr-2 h-4 w-4" />
+                        Previous
+                    </Button>
+
                     <Button
                         onClick={handleNextPage}
-                        disabled={isLoading}
+                        disabled={!data?.next || isLoading}
                         className="bg-green-700 hover:bg-green-800 text-white"
                     >
                         {isLoading ? (
@@ -116,7 +137,7 @@ export default function FarmPage() {
                             </>
                         ) : (
                             <>
-                                View More Farms
+                                Next
                                 <ChevronDown className="ml-2 h-4 w-4" />
                             </>
                         )}
