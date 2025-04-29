@@ -1,0 +1,25 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Django specific
+*.sqlite3
+*.log
+*.pot
+local_settings.py
+db.sqlite3
+
+# Pipenv / Poetry / venvs
+Pipfile.lock
+poetry.lock
+.env
+.venv/
+venv/
+env/
+ENV/
+
+# Migrations
+*/migrations/
