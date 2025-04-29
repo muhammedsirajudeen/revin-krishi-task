@@ -12,6 +12,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import axiosInstance from "@/app/helper/axiosInstance"
+import { ToastStyles } from "@/lib/utils"
+import { AxiosError } from "axios"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -31,21 +34,29 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
+    // TODO: add validation atlast also name should not contain space
+
     if (formData.password !== formData.confirmPassword) {
-      toast.error("Passwords do not match")
+      toast.error("Passwords do not match", ToastStyles.warn)
       return
     }
 
     setIsLoading(true)
 
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      toast.success("Registration successful!")
+      const response = await axiosInstance.post('/user/register', { username: formData.name, email: formData.email, password: formData.password })
+      console.log(response)
+      toast.success("Registration successful!", ToastStyles.success)
       router.push("/auth/login")
     } catch (error) {
-      toast.error("Registration failed")
+      const apiError = error as AxiosError
+      switch (apiError.status) {
+        case 400:
+          toast.error("User with the username/email already exists")
+          break
+        default:
+          toast.error("Failed to Register")
+      }
     } finally {
       setIsLoading(false)
     }

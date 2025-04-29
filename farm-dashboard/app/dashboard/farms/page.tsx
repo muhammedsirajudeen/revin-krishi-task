@@ -1,5 +1,7 @@
+import FarmPage from "./FarmComponent";
+
 export default function Farm() {
     return (
-        <p>farm</p>
+        <FarmPage />
     )
 }

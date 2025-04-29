@@ -12,6 +12,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import axiosInstance from "@/app/helper/axiosInstance"
+import { ToastStyles } from "@/lib/utils"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -29,20 +31,15 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-
+    // TODO: login validation
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000))
 
-      // In a real app, you would validate credentials with your backend
-      if (formData.email === "admin@farm.com" && formData.password === "password") {
-        toast.success("Login successful!")
-        router.push("/dashboard")
-      } else {
-        toast.error("Invalid credentials")
-      }
+      const response = await axiosInstance.post('/user/login', { email: formData.email, password: formData.password })
+      window.localStorage.setItem('token', response.data.access)
+      toast.success('Login success', ToastStyles.success)
+      router.push('/dashboard')
     } catch (error) {
-      toast.error("Login failed")
+      toast.error("Login failed", ToastStyles.error)
     } finally {
       setIsLoading(false)
     }
