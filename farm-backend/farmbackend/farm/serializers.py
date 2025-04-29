@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from .models import Farm
-
+from user.serializers import UserSerializer
 class FarmSerializer(serializers.ModelSerializer):
     class Meta:
         model = Farm
@@ -19,3 +19,11 @@ class FarmSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Invalid image format. Allowed formats: PNG, JPG, JPEG, GIF.")
         
         return value
+
+
+class FarmListSerializer(serializers.ModelSerializer):
+    owner = UserSerializer(read_only=True)  # Join the owner as nested object
+
+    class Meta:
+        model = Farm
+        fields = ['id', 'name', 'location', 'size_in_acres', 'description', 'image', 'owner']

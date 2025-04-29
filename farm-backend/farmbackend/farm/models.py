@@ -6,7 +6,7 @@ class Farm(models.Model):
     name = models.CharField(max_length=255)
     location = models.CharField(max_length=255)
     owner = models.ForeignKey('user.CustomUser', on_delete=models.CASCADE)
-    size_in_acres = models.FloatField(null=True, blank=True)
+    size_in_acres = models.FloatField(null=False, blank=False)
     description = models.TextField()
     image = models.FileField(upload_to='images/')  # Store in 'media/documents/'
 
