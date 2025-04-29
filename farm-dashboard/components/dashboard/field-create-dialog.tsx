@@ -19,6 +19,8 @@ import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "
 import { z } from "zod";
 import { toast } from "sonner";
 import { ToastStyles } from "@/lib/utils";
+import axiosInstance from "@/app/helper/axiosInstance";
+import { useParams } from "next/navigation";
 
 const fieldSchema = z.object({
     name: z.string().min(1, "Field name is required"),
@@ -38,7 +40,7 @@ type FieldFormData = z.infer<typeof fieldSchema>;
 export function FieldCreateDialog() {
     const [open, setOpen] = useState(false);
     const [preview, setPreview] = useState<string | null>(null);
-
+    const { id } = useParams()
     const form = useForm<FieldFormData>({
         resolver: zodResolver(fieldSchema),
         defaultValues: {
@@ -50,9 +52,10 @@ export function FieldCreateDialog() {
         },
     });
 
-    const onSubmit = (data: FieldFormData) => {
+    const onSubmit = async (data: FieldFormData) => {
         try {
             const formData = new FormData();
+            formData.append('farm', id as string)
             Object.entries(data).forEach(([key, value]) => {
                 if (key === "image" && value instanceof File) {
                     formData.append("image", value);
@@ -62,11 +65,14 @@ export function FieldCreateDialog() {
             });
 
             console.log("Form Submitted:", data);
+            const response = await axiosInstance.post('/field/create', formData)
+            console.log(response)
+
             toast.success('Created Field', ToastStyles.success)
         } catch (error) {
             toast.error('Failed to create field', ToastStyles.error)
         } finally {
-            // setOpen(false);
+            setOpen(false);
         }
     };
 

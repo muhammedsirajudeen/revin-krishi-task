@@ -22,7 +22,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('user/', include('user.urls')),  # 🔥 This line loads your app's urls
-    path('farm/',include('farm.urls'))
+    path('farm/',include('farm.urls')),
+    path('field/',include('field.urls'))
 ]
 
 if settings.DEBUG:

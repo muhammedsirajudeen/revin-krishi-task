@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'corsheaders',
     'user',
     'farm',
+    'field',
     'rest_framework',
 
 ]
