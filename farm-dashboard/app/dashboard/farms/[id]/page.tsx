@@ -12,6 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { Field } from "react-hook-form"
+import FieldByFarm from "@/components/dashboard/field-by-farm"
 
 export default function IndividualPage() {
     const { id } = useParams()
@@ -138,11 +140,12 @@ export default function IndividualPage() {
                             <FieldCreateDialog />
 
                             {/* Placeholder for fields list - would be populated from API */}
-                            <div className="mt-6 grid gap-4">
+                            {/* <div className="mt-6 grid gap-4">
                                 <div className="h-24 rounded-lg border border-dashed border-green-300 flex items-center justify-center bg-green-50/50">
                                     <p className="text-green-600 text-sm">No fields added yet</p>
                                 </div>
-                            </div>
+                            </div> */}
+                            <FieldByFarm farmId={id as string} />
                         </CardContent>
                     </Card>
 

@@ -14,7 +14,7 @@ export interface Field {
     id: string; // UUID or database ID
     name: string;
     farmId: string; // ID of the associated farm
-    managerId: string; // User ID of the field manager
+    manager: string; // User ID of the field manager
     sizeInAcres: number; // optional
     description: string;
     image: string;

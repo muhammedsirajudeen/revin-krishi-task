@@ -13,18 +13,18 @@ import { Badge } from '@/components/ui/badge'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 
-type PaginatedFarmsResponse = {
+export type PaginatedFarmsResponse<T> = {
     count: number
     next: string | null
     previous: string | null
-    results: Farm[]
+    results: T[]
 }
 
 export default function FarmPage() {
     const [page, setPage] = useState(1)
     const PAGE_SIZE = 6
     const router = useRouter()
-    const { data, isLoading } = useSWR<PaginatedFarmsResponse>(
+    const { data, isLoading } = useSWR<PaginatedFarmsResponse<Farm>>(
         `/farm/list?page=${page}&limit=${PAGE_SIZE}`,
         fetcher
     )
