@@ -3,6 +3,7 @@ import { CamelCaseToSnakeCase } from "@/lib/utils";
 export interface User {
     id: string
     email: string
+    role: string
 }
 export interface Farm {
     id: string; // UUID or database ID

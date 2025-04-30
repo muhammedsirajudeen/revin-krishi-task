@@ -1,6 +1,5 @@
 from rest_framework import status, generics
 from rest_framework.response import Response
-from .serializers import UserSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.views import APIView
@@ -8,9 +7,11 @@ from rest_framework.exceptions import ValidationError
 from helper.fetch_google import GoogleLoginHelper
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from django.contrib.auth.hashers import make_password
+from rest_framework.generics import ListAPIView
 
+from .serializers import UserSerializer,ListUserSerializer
 from .models import CustomUser
-
+from helper.custom_pagination import CustomPageNumberPagination
 class UserRegistrationView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes=[AllowAny]
@@ -118,3 +119,11 @@ class AddMember(APIView):
             return Response({'message': 'Member created successfully'}, status=status.HTTP_201_CREATED)
         except ValidationError as e:
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+class ListMembers(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = ListUserSerializer
+    pagination_class = CustomPageNumberPagination
+
+    def get_queryset(self):
+        return CustomUser.objects.filter(managed_by=self.request.user)

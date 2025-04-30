@@ -13,3 +13,8 @@ class UserSerializer(serializers.ModelSerializer):
             password=validated_data['password']
         )
         return user
+
+class ListUserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=CustomUser
+        fields=['email','role']
