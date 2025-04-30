@@ -18,10 +18,11 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PaginatedFarmsResponse } from "@/app/dashboard/farms/FarmComponent"
-import { ToastStyles } from "@/lib/utils"
-import { JoinedTask } from "@/app/types/farm.types"
+import { fetcher, ToastStyles } from "@/lib/utils"
+import { Farm, JoinedTask, User } from "@/app/types/farm.types"
 import axiosInstance from "@/app/helper/axiosInstance"
 import { EditTaskDialog } from "../edit-task-dialog"
+import useSWR from "swr"
 
 interface TaskListProps {
   tasks: PaginatedFarmsResponse<JoinedTask>["results"]
@@ -32,21 +33,32 @@ export function TasksList({ tasks: initialTasks, mutate }: TaskListProps) {
   const [open, setOpen] = useState(false)
   const [task, setTask] = useState<JoinedTask>()
   const [tasks, setTasks] = useState(initialTasks)
+  const [user, setUser] = useState<string>("")
+  const [farm, setFarm] = useState<string>("")
   useEffect(() => {
     setTasks(initialTasks)
   }, [initialTasks])
   const [statusFilter, setStatusFilter] = useState("all")
   const [searchQuery, setSearchQuery] = useState("")
-
+  const { data } = useSWR<PaginatedFarmsResponse<User>>(
+    `/user/list?limit=${100}`,
+    fetcher
+  )
+  const { data: farmData } = useSWR<PaginatedFarmsResponse<Farm>>(
+    `/farm/list/owner?limit=${100}`,
+    fetcher
+  )
   const filteredTasks = tasks.filter((task) => {
-    const matchesStatus = statusFilter === "all" || task.priority === statusFilter
+    const matchesStatus = statusFilter === "all" || task.status === statusFilter
     const matchesSearch =
       task.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.assigned_to.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.farm.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       task.field.name.toLowerCase().includes(searchQuery.toLowerCase())
+    const matchesUser = !user || task.assigned_to.email == user
+    const matchesFarm = !farm || task.farm.id === farm
 
-    return matchesStatus && matchesSearch
+    return matchesStatus && matchesSearch && matchesUser && matchesFarm
   })
 
   const handleStatusChange = async (taskId: string, newStatus: string) => {
@@ -112,6 +124,34 @@ export function TasksList({ tasks: initialTasks, mutate }: TaskListProps) {
           onChange={(e) => setSearchQuery(e.target.value)}
           className="flex-1"
         />
+        <Select value={user} onValueChange={setUser}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by user" />
+          </SelectTrigger>
+          <SelectContent>
+            {
+              data?.results.map((result, index) => {
+                return (
+                  <SelectItem defaultChecked={index === 0} key={result.id} value={result.email}>{result.email}</SelectItem>
+                )
+              })
+            }
+          </SelectContent>
+        </Select>
+        <Select value={farm} onValueChange={setFarm}>
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Filter by farm" />
+          </SelectTrigger>
+          <SelectContent>
+            {
+              farmData?.results.map((result, index) => {
+                return (
+                  <SelectItem defaultChecked={index === 0} key={result.id} value={result.id}>{result.name}</SelectItem>
+                )
+              })
+            }
+          </SelectContent>
+        </Select>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder="Filter by status" />
