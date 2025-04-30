@@ -41,11 +41,18 @@ export interface JoinedField extends Omit<CamelCaseToSnakeCase<Field>, "manager"
 
 
 export interface Task {
+    id: string
     title: string
     description?: string
-    deadline: Date | null
+    deadline: string
     priority: "low" | "medium" | "high" | "urgent"
-    farm: "farm1" | "farm2" | "farm3" | "farm4"
-    field: "field1" | "field2" | "field3" | "field4"
-    assignedTo: "user1" | "user2" | "user3" | "user4"
+    farm: string
+    field: string
+    assignedTo: string
+    status: string
+}
+export interface JoinedTask extends Omit<CamelCaseToSnakeCase<Task>, "farm" | "field" | "assigned_to"> {
+    farm: Farm
+    field: Field
+    assigned_to: User
 }

@@ -22,7 +22,7 @@ class Task(models.Model):
     field = models.ForeignKey(Field, on_delete=models.CASCADE, related_name="tasks")
     assigned_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name="assigned_tasks")
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name="created_tasks")
-
+    status = models.TextField(blank=True,default="pending")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
