@@ -10,7 +10,7 @@ class FarmSerializer(serializers.ModelSerializer):
         """
         Validate that the uploaded image is under 5MB.
         """
-        max_size = 5 * 1024 * 1024  # 5MB
+        max_size = 300 * 1024  # 300KB max size
         if value.size > max_size:
             raise serializers.ValidationError("Image size exceeds the 5MB limit.")
         

@@ -72,10 +72,10 @@ export function FieldCreateDialog() {
             console.log(response);
             window.location.reload()
             toast.success('Created Field', ToastStyles.success);
+            setOpen(false);
         } catch (error) {
             toast.error('Failed to create field', ToastStyles.error);
         } finally {
-            setOpen(false);
         }
     };
 

@@ -134,6 +134,7 @@ export function TasksList({ tasks: initialTasks, mutate }: TaskListProps) {
               <TableHead>Priority</TableHead>
               <TableHead>Deadline</TableHead>
               <TableHead>Assigned To</TableHead>
+              <TableHead>type</TableHead>
               <TableHead>Farm/Field</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -154,6 +155,9 @@ export function TasksList({ tasks: initialTasks, mutate }: TaskListProps) {
                   <TableCell>{new Date(task.deadline).toLocaleDateString()}</TableCell>
                   <TableCell>{task.assigned_to.email}</TableCell>
                   <TableCell>{`${task.farm.name} / ${task.field.name}`}</TableCell>
+                  <TableCell>
+                    {task.type}
+                  </TableCell>
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -189,6 +193,7 @@ export function TasksList({ tasks: initialTasks, mutate }: TaskListProps) {
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
+
                 </TableRow>
               ))
             )}

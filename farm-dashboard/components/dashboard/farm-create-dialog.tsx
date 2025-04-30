@@ -62,13 +62,15 @@ const FarmCreationDialog = () => {
 
             console.log('Response:', response.data);
             toast.success('Farm created successfully', ToastStyles.success)
+            reset();
+            setIsOpen(false);
+            setImagePreview(null);
+            window.location.reload()
+
         } catch (error) {
             console.error('Error creating farm:', error);
             toast.error('Error in creating farm', ToastStyles.error)
         } finally {
-            reset();
-            setIsOpen(false);
-            setImagePreview(null);
         }
     };
 
