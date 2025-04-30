@@ -1,20 +1,9 @@
 from django.db import models
 from django.contrib.auth import get_user_model
+from field.models import Field
+from farm.models import Farm
 
 User = get_user_model()
-
-class Farm(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-class Field(models.Model):
-    name = models.CharField(max_length=100)
-    farm = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name="fields")
-
-    def __str__(self):
-        return self.name
 
 class Task(models.Model):
     PRIORITY_CHOICES = [

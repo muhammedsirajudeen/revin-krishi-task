@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { Fragment, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { CalendarIcon, Loader2 } from "lucide-react"
@@ -11,7 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 
 
-import { cn } from "@/lib/utils"
+import { CamelCaseToSnakeCase, cn, fetcher, ToastStyles } from "@/lib/utils"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -20,6 +20,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import axiosInstance from "@/app/helper/axiosInstance"
+import useSWR from "swr"
+import { PaginatedFarmsResponse } from "../../farms/FarmComponent"
+import { Farm, Field, User } from "@/app/types/farm.types"
 
 // ✅ Schema
 const taskSchema = z.object({
@@ -29,7 +33,7 @@ const taskSchema = z.object({
   priority: z.enum(["low", "medium", "high", "urgent"], { required_error: "Select a priority" }),
   farm: z.string().min(1, "Select a farm"),
   field: z.string().min(1, "Select a field"),
-  user: z.string().min(1, "Select a user"),
+  assigned_to: z.string().min(1, "Select a user"),
 })
 
 type TaskFormValues = z.infer<typeof taskSchema>
@@ -37,7 +41,16 @@ type TaskFormValues = z.infer<typeof taskSchema>
 export default function NewTaskPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-
+  const { data, isLoading: managerLoading, mutate } = useSWR<PaginatedFarmsResponse<User>>(
+    `/user/list?limit=${100}`,
+    fetcher
+  )
+  const { data: farmData, isLoading: farmLoading } = useSWR<PaginatedFarmsResponse<Farm>>(
+    `/farm/list/owner?limit=${100}`,
+    fetcher
+  )
+  const [fields, setFields] = useState<Field[]>([])
+  console.log(farmData)
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
@@ -47,20 +60,40 @@ export default function NewTaskPage() {
       priority: undefined,
       farm: "",
       field: "",
-      user: "",
+      assigned_to: "",
     },
   })
 
   const onSubmit = async (values: TaskFormValues) => {
     setIsLoading(true)
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-      toast.success("Task created successfully!")
+      // Convert the date to yyyy-mm-dd format
+      const formattedValues = {
+        ...values,
+        deadline: values.deadline.toISOString().split("T")[0], // "YYYY-MM-DD"
+      }
+
+      const response = await axiosInstance.post('/task/add', formattedValues)
+      toast.success("Task created successfully!", ToastStyles.success)
       router.push("/dashboard/tasks")
     } catch {
       toast.error("Failed to create task")
     } finally {
       setIsLoading(false)
+      form.reset()
+    }
+  }
+
+  const handleFarmChange = async () => {
+    try {
+      console.log(form.getValues().farm)
+      const farmId = form.getValues().farm
+      const response = await axiosInstance.get(`field/farm/${farmId}?limit=100`)
+      console.log(response)
+      setFields(response.data.results)
+    } catch (error) {
+      console.log(error)
+      toast.error('error loading field data')
     }
   }
 
@@ -177,17 +210,23 @@ export default function NewTaskPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Assign to Farm</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <Select onValueChange={(args) => {
+                        field.onChange(args)
+                        handleFarmChange()
+                      }} defaultValue={field.value}>
                         <FormControl>
                           <SelectTrigger>
                             <SelectValue placeholder="Select farm" />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="farm1">North Farm</SelectItem>
-                          <SelectItem value="farm2">South Farm</SelectItem>
-                          <SelectItem value="farm3">East Farm</SelectItem>
-                          <SelectItem value="farm4">West Farm</SelectItem>
+                          {
+                            farmData?.results.map((result) => {
+                              return (
+                                <SelectItem key={result.id} value={result.id}>{result.name}</SelectItem>
+                              )
+                            })
+                          }
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -209,10 +248,13 @@ export default function NewTaskPage() {
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
-                          <SelectItem value="field1">Field A</SelectItem>
-                          <SelectItem value="field2">Field B</SelectItem>
-                          <SelectItem value="field3">Field C</SelectItem>
-                          <SelectItem value="field4">Field D</SelectItem>
+                          {
+                            fields.map((field) => {
+                              return (
+                                <SelectItem key={field.id} value={field.id}>{field.name}</SelectItem>
+                              )
+                            })
+                          }
                         </SelectContent>
                       </Select>
                       <FormMessage />
@@ -224,27 +266,29 @@ export default function NewTaskPage() {
               {/* User */}
               <FormField
                 control={form.control}
-                name="user"
+                name="assigned_to"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Assign to User</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select value={field.value} onValueChange={field.onChange}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select user" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="user1">John Doe (Farm Manager)</SelectItem>
-                        <SelectItem value="user2">Sarah Smith (Field Worker)</SelectItem>
-                        <SelectItem value="user3">Mike Johnson (Field Worker)</SelectItem>
-                        <SelectItem value="user4">Robert Brown (Mechanic)</SelectItem>
+                        {data?.results.map((result, index) => (
+                          <SelectItem key={index} value={result.id.toString()}>
+                            {result.email}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
                   </FormItem>
                 )}
               />
+
             </CardContent>
             <CardFooter className="flex justify-between">
               <Button type="button" variant="outline" onClick={() => router.back()}>

@@ -30,6 +30,12 @@ class FarmListView(ListAPIView):
     queryset = Farm.objects.all()
     pagination_class = CustomPageNumberPagination
 
+class FarmListViewByOwner(ListAPIView):
+    permission_classes = [IsAuthenticated]
+    serializer_class = FarmListSerializer
+    pagination_class = CustomPageNumberPagination
+    def get_queryset(self):
+        return Farm.objects.filter(owner=self.request.user)
 
 class FarmRetrieveView(RetrieveAPIView):
     queryset = Farm.objects.all()

@@ -17,4 +17,4 @@ class UserSerializer(serializers.ModelSerializer):
 class ListUserSerializer(serializers.ModelSerializer):
     class Meta:
         model=CustomUser
-        fields=['email','role']
+        fields=['email','role','id']
