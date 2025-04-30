@@ -38,3 +38,14 @@ export interface JoinedField extends Omit<CamelCaseToSnakeCase<Field>, "manager"
     crop: Crop
     manager: User
 }
+
+
+export interface Task {
+    title: string
+    description?: string
+    deadline: Date | null
+    priority: "low" | "medium" | "high" | "urgent"
+    farm: "farm1" | "farm2" | "farm3" | "farm4"
+    field: "field1" | "field2" | "field3" | "field4"
+    assignedTo: "user1" | "user2" | "user3" | "user4"
+}
