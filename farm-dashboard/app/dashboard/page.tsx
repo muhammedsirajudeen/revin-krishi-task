@@ -1,3 +1,4 @@
+'use client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CalendarDateRangePicker } from "@/components/dashboard/date-range-picker"
@@ -6,8 +7,25 @@ import { RecentTasks } from "@/components/dashboard/recent-tasks"
 import { TasksStatusChart } from "@/components/dashboard/tasks-status-chart"
 import { UpcomingHarvests } from "@/components/dashboard/upcoming-harvests"
 import { StatsCards } from "@/components/dashboard/stats-cards"
+import useSWR from "swr"
+import { fetcher } from "@/lib/utils"
+import { JoinedTask, Task } from "../types/farm.types"
+
+export interface DashboardResponse {
+  "farm": number,
+  "field": number,
+  "crop": number,
+  "recent_task": JoinedTask[],
+  "recent_harvest": JoinedTask[],
+  "pending": number,
+  "progress": number,
+  "completed": number,
+  "task": number
+}
 
 export default function DashboardPage() {
+  const { data, isLoading } = useSWR<DashboardResponse>('/farm/summary', fetcher)
+  console.log(data)
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
@@ -20,11 +38,23 @@ export default function DashboardPage() {
       <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
-          <TabsTrigger value="analytics">Analytics</TabsTrigger>
-          <TabsTrigger value="reports">Reports</TabsTrigger>
+          {/* <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="reports">Reports</TabsTrigger> */}
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
-          <StatsCards />
+          {/* completed */}
+          <StatsCards
+            pending={data?.pending ?? 0}
+            progress={data?.progress ?? 0}
+            completed={data?.completed ?? 0}
+            recent_harvest={data?.recent_harvest ?? []}
+            recent_task={data?.recent_task ?? []}
+            crop={data?.crop ?? 0}
+            farm={data?.farm ?? 0}
+            field={data?.field ?? 0}
+            task={data?.task ?? 0}
+
+          />
 
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
             <Card className="lg:col-span-4">
@@ -33,7 +63,17 @@ export default function DashboardPage() {
                 <CardDescription>Farm activity for the current period</CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
-                <Overview />
+                <Overview
+                  pending={data?.pending ?? 0}
+                  progress={data?.progress ?? 0}
+                  completed={data?.completed ?? 0}
+                  recent_harvest={data?.recent_harvest ?? []}
+                  recent_task={data?.recent_task ?? []}
+                  crop={data?.crop ?? 0}
+                  farm={data?.farm ?? 0}
+                  field={data?.field ?? 0}
+                  task={data?.task ?? 0}
+                />
               </CardContent>
             </Card>
             <Card className="lg:col-span-3">
@@ -42,7 +82,17 @@ export default function DashboardPage() {
                 <CardDescription>Distribution of tasks by status</CardDescription>
               </CardHeader>
               <CardContent>
-                <TasksStatusChart />
+                <TasksStatusChart
+                  pending={data?.pending ?? 0}
+                  progress={data?.progress ?? 0}
+                  completed={data?.completed ?? 0}
+                  recent_harvest={data?.recent_harvest ?? []}
+                  recent_task={data?.recent_task ?? []}
+                  crop={data?.crop ?? 0}
+                  farm={data?.farm ?? 0}
+                  field={data?.field ?? 0}
+                  task={data?.task ?? 0}
+                />
               </CardContent>
             </Card>
           </div>
@@ -54,7 +104,17 @@ export default function DashboardPage() {
                 <CardDescription>Tasks that need your attention</CardDescription>
               </CardHeader>
               <CardContent>
-                <RecentTasks />
+                <RecentTasks
+                  pending={data?.pending ?? 0}
+                  progress={data?.progress ?? 0}
+                  completed={data?.completed ?? 0}
+                  recent_harvest={data?.recent_harvest ?? []}
+                  recent_task={data?.recent_task ?? []}
+                  crop={data?.crop ?? 0}
+                  farm={data?.farm ?? 0}
+                  field={data?.field ?? 0}
+                  task={data?.task ?? 0}
+                />
               </CardContent>
             </Card>
             <Card>
@@ -63,7 +123,17 @@ export default function DashboardPage() {
                 <CardDescription>Scheduled harvests for the next 30 days</CardDescription>
               </CardHeader>
               <CardContent>
-                <UpcomingHarvests />
+                <UpcomingHarvests
+                  pending={data?.pending ?? 0}
+                  progress={data?.progress ?? 0}
+                  completed={data?.completed ?? 0}
+                  recent_harvest={data?.recent_harvest ?? []}
+                  recent_task={data?.recent_task ?? []}
+                  crop={data?.crop ?? 0}
+                  farm={data?.farm ?? 0}
+                  field={data?.field ?? 0}
+                  task={data?.task ?? 0}
+                />
               </CardContent>
             </Card>
           </div>
@@ -76,7 +146,17 @@ export default function DashboardPage() {
                 <CardDescription>Yield comparison by crop type</CardDescription>
               </CardHeader>
               <CardContent className="pl-2">
-                <Overview />
+                <Overview
+                  pending={data?.pending ?? 0}
+                  progress={data?.progress ?? 0}
+                  completed={data?.completed ?? 0}
+                  recent_harvest={data?.recent_harvest ?? []}
+                  recent_task={data?.recent_task ?? []}
+                  crop={data?.crop ?? 0}
+                  farm={data?.farm ?? 0}
+                  field={data?.field ?? 0}
+                  task={data?.task ?? 0}
+                />
               </CardContent>
             </Card>
             <Card>
@@ -85,7 +165,17 @@ export default function DashboardPage() {
                 <CardDescription>Distribution of resources</CardDescription>
               </CardHeader>
               <CardContent>
-                <TasksStatusChart />
+                <TasksStatusChart
+                  pending={data?.pending ?? 0}
+                  progress={data?.progress ?? 0}
+                  completed={data?.completed ?? 0}
+                  recent_harvest={data?.recent_harvest ?? []}
+                  recent_task={data?.recent_task ?? []}
+                  crop={data?.crop ?? 0}
+                  farm={data?.farm ?? 0}
+                  field={data?.field ?? 0}
+                  task={data?.task ?? 0}
+                />
               </CardContent>
             </Card>
           </div>

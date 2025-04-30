@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "sonner"
+import { DashboardResponse } from "@/app/dashboard/page"
 
 const tasks = [
   {
@@ -38,7 +39,7 @@ const tasks = [
   },
 ]
 
-export function RecentTasks() {
+export function RecentTasks({ recent_task }: DashboardResponse) {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "pending":
@@ -77,22 +78,22 @@ export function RecentTasks() {
 
   return (
     <div className="space-y-4">
-      {tasks.map((task) => (
+      {recent_task.map((task) => (
         <Card key={task.id} className="overflow-hidden">
           <CardContent className="p-0">
             <div className="p-4">
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="font-medium">{task.title}</h3>
-                  <p className="text-sm text-muted-foreground">Assigned to: {task.assignedTo}</p>
+                  {/* <p className="text-sm text-muted-foreground">Assigned to: {task.assigned_to.email}</p> */}
                 </div>
                 {getStatusBadge(task.status)}
               </div>
               <div className="mt-2 flex items-center text-sm text-muted-foreground">
-                <span>Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+                <span>Due: {new Date(task.deadline).toLocaleDateString()}</span>
               </div>
-              {task.status !== "completed" && (
-                <div className="mt-4 flex gap-2">
+              {/* {task.status !== "completed" && ( */}
+              {/* <div className="mt-4 flex gap-2">
                   <Button size="sm" variant="outline" className="w-full" onClick={() => handleComplete(task.id)}>
                     <CheckCircle2 className="mr-2 h-4 w-4" />
                     Complete
@@ -102,7 +103,7 @@ export function RecentTasks() {
                     Cancel
                   </Button>
                 </div>
-              )}
+              )} */}
             </div>
           </CardContent>
         </Card>

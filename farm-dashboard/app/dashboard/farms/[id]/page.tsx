@@ -16,11 +16,16 @@ import { Field } from "react-hook-form"
 import FieldByFarm from "@/components/dashboard/field-by-farm"
 import { useState } from "react"
 import CropAddDialog from "@/components/dashboard/crop-add-dialog"
+import { PaginatedFarmsResponse } from "../FarmComponent"
 
 export default function IndividualPage() {
     const { id } = useParams()
     const { data, isLoading }: { data?: CamelCaseToSnakeCase<Farm>; isLoading: boolean } = useSWR(
         `/farm/list/${id}`,
+        fetcher,
+    )
+    const { data: fieldData, isLoading: fieldLoading, mutate } = useSWR<PaginatedFarmsResponse<CamelCaseToSnakeCase<Field>>>(
+        id ? `/field/farm/${id}` : null,
         fetcher,
     )
     // TODO: implement mutating stuff
@@ -167,7 +172,7 @@ export default function IndividualPage() {
                                 </li>
                                 <li className="flex justify-between items-center pb-2 border-b border-green-100">
                                     <span className="text-gray-600">Fields</span>
-                                    <span className="font-medium text-green-800">0</span>
+                                    <span className="font-medium text-green-800">{fieldData?.count}</span>
                                 </li>
                                 <li className="flex justify-between items-center pb-2 border-b border-green-100">
                                     <span className="text-gray-600">Created</span>

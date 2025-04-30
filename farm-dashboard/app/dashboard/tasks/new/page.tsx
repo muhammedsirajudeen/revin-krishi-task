@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { Fragment, useState } from "react"
+import { Fragment, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { CalendarIcon, Loader2 } from "lucide-react"
@@ -51,7 +51,6 @@ export default function NewTaskPage() {
     fetcher
   )
   const [fields, setFields] = useState<Field[]>([])
-
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
@@ -64,7 +63,13 @@ export default function NewTaskPage() {
       assigned_to: "",
     },
   })
-
+  useEffect(() => {
+    if (window) {
+      const date = window.localStorage.getItem('current-date')
+      console.log(date)
+      form.setValue("deadline", new Date(date ?? ""))
+    }
+  }, [])
   const onSubmit = async (values: TaskFormValues) => {
     setIsLoading(true)
     try {

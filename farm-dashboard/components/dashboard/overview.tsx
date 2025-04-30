@@ -3,46 +3,17 @@
 import { Line, LineChart, ResponsiveContainer, XAxis, YAxis } from "recharts"
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { DashboardResponse } from "@/app/dashboard/page"
 
-const data = [
-  {
-    name: "Jan",
-    crops: 2400,
-    tasks: 1400,
-  },
-  {
-    name: "Feb",
-    crops: 1398,
-    tasks: 1210,
-  },
-  {
-    name: "Mar",
-    crops: 9800,
-    tasks: 2290,
-  },
-  {
-    name: "Apr",
-    crops: 3908,
-    tasks: 2000,
-  },
-  {
-    name: "May",
-    crops: 4800,
-    tasks: 2181,
-  },
-  {
-    name: "Jun",
-    crops: 3800,
-    tasks: 2500,
-  },
-  {
-    name: "Jul",
-    crops: 4300,
-    tasks: 2100,
-  },
-]
 
-export function Overview() {
+export function Overview({ crop, task }: DashboardResponse) {
+  const data = [
+    {
+      name: "May",
+      crops: crop,
+      tasks: task,
+    },
+  ]
   return (
     <ChartContainer
       config={{

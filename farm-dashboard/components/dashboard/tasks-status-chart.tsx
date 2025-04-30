@@ -3,14 +3,16 @@
 import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts"
 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { DashboardResponse } from "@/app/dashboard/page"
 
-const data = [
-  { name: "Pending", value: 12, color: "hsl(var(--warning))" },
-  { name: "In Progress", value: 8, color: "hsl(var(--info))" },
-  { name: "Completed", value: 20, color: "hsl(var(--success))" },
-]
 
-export function TasksStatusChart() {
+export function TasksStatusChart({ pending, progress, completed }: DashboardResponse) {
+  const data = [
+    { name: "Pending", value: pending, color: "hsl(var(--warning))" },
+    { name: "In Progress", value: progress, color: "hsl(var(--info))" },
+    { name: "Completed", value: completed, color: "hsl(var(--success))" },
+  ]
+
   return (
     <ChartContainer
       config={{

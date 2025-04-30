@@ -26,59 +26,14 @@ import { PaginatedFarmsResponse } from "../farms/FarmComponent"
 import { JoinedTask } from "@/app/types/farm.types"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-
-// Sample data
-// const events = [
-//   {
-//     id: 1,
-//     title: "Irrigation check for Field A",
-//     date: addDays(startOfToday(), 1).toISOString(),
-//     type: "task",
-//     status: "pending",
-//   },
-//   {
-//     id: 2,
-//     title: "Apply fertilizer to corn crops",
-//     date: addDays(startOfToday(), 2).toISOString(),
-//     type: "task",
-//     status: "in-progress",
-//   },
-//   {
-//     id: 3,
-//     title: "Harvest wheat in Field C",
-//     date: addDays(startOfToday(), 5).toISOString(),
-//     type: "harvest",
-//     status: "pending",
-//   },
-//   {
-//     id: 4,
-//     title: "Repair tractor #3",
-//     date: addDays(startOfToday(), -1).toISOString(),
-//     type: "maintenance",
-//     status: "completed",
-//   },
-//   {
-//     id: 5,
-//     title: "Pest control in Field D",
-//     date: addDays(startOfToday(), 3).toISOString(),
-//     type: "task",
-//     status: "in-progress",
-//   },
-//   {
-//     id: 6,
-//     title: "Team meeting",
-//     date: startOfToday().toISOString(),
-//     type: "meeting",
-//     status: "pending",
-//   },
-// ]
+import { useRouter } from "next/navigation"
 
 export default function CalendarPage() {
   const { data: events, isLoading, mutate } = useSWR<PaginatedFarmsResponse<JoinedTask>>(
     `/task/list?limit=${100}`,
     fetcher
   )
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(startOfToday())
+  const router = useRouter()
   const [currentMonth, setCurrentMonth] = useState(startOfToday())
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedEventDetails, setSelectedEventDetails] = useState<JoinedTask | null>(null)
@@ -105,17 +60,22 @@ export default function CalendarPage() {
 
   const handleAddEvent = () => {
     toast.success("Event added successfully")
-    setIsDialogOpen(false)
   }
 
   const handleDateClick = (date: Date) => {
-    setSelectedDate(date)
     const eventsForDate = getEventsForDate(date) ?? []
     if (eventsForDate.length > 0) {
       // If there are events, you can set the first one as the default event to show
       setSelectedEventDetails(eventsForDate[0])
       setIsDialogOpen(true)
     }
+  }
+
+  const handleAddEventButtonClick = (date: Date, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the cell click event
+    console.log("Add event for date:", format(date, "yyyy-MM-dd"));
+    window.localStorage.setItem('current-date', format(date, "yyyy-MM-dd"))
+    window.location.href = '/dashboard/tasks/new'
   }
 
   const getEventsForDate = (date: Date) => {
@@ -210,10 +170,11 @@ export default function CalendarPage() {
                 <div
                   key={i}
                   className={cn(
-                    "min-h-24 rounded-lg border p-1",
+                    "min-h-24 rounded-lg border p-1 relative cursor-pointer",
                     isCurrentMonth ? "bg-card" : "bg-muted/50 text-muted-foreground",
                     isToday && "border-primary",
                   )}
+                  onClick={() => isCurrentMonth && handleDateClick(date)}
                 >
                   <div className="flex justify-between p-1">
                     <span
@@ -239,7 +200,6 @@ export default function CalendarPage() {
                           getEventTypeColor(event.type),
                         )}
                         title={event.title}
-                        onClick={() => handleDateClick(date)}
                       >
                         {event.title}
                       </div>
@@ -248,6 +208,16 @@ export default function CalendarPage() {
                       <div className="text-xs text-muted-foreground">+{dateEvents.length - 3} more</div>
                     )}
                   </div>
+                  {isCurrentMonth && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="absolute bottom-1 right-1 h-5 w-5 rounded-full bg-primary/10 hover:bg-primary/20"
+                      onClick={(e) => handleAddEventButtonClick(date, e)}
+                    >
+                      <Plus className="h-3 w-3" />
+                    </Button>
+                  )}
                 </div>
               )
             })}
@@ -255,10 +225,8 @@ export default function CalendarPage() {
         </CardContent>
       </Card>
 
+      {/* Event Details Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogTrigger asChild>
-          <Button variant="outline">View Event Details</Button>
-        </DialogTrigger>
         <DialogContent className="sm:max-w-md md:max-w-lg">
           {selectedEventDetails && (
             <>
@@ -287,7 +255,6 @@ export default function CalendarPage() {
 
                 <div className="grid gap-3 sm:grid-cols-2">
                   <div className="flex items-start gap-2">
-                    {/* <Farm className="h-4 w-4 mt-0.5 text-muted-foreground" /> */}
                     <div>
                       <p className="text-sm font-medium">Farm</p>
                       <p className="text-sm text-muted-foreground">{selectedEventDetails.farm.name}</p>
@@ -365,6 +332,11 @@ function Calendar({
     setCurrentMonth(date)
   }
 
+  const handleAddButtonClick = (date: Date, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the cell click event
+    console.log("Add event for date:", format(date, "yyyy-MM-dd"));
+  }
+
   return (
     <div className="p-3">
       <div className="flex items-center justify-between">
@@ -394,21 +366,32 @@ function Calendar({
           const isSelected = selected?.toDateString() === date.toDateString()
 
           return (
-            <button
-              key={i}
-              type="button"
-              className={cn(
-                "inline-flex h-8 w-8 items-center justify-center rounded p-0 text-sm font-normal",
-                isCurrentMonth ? "text-foreground" : "text-muted-foreground",
-                isToday && "bg-accent text-accent-foreground",
-                isSelected && "bg-primary text-primary-foreground",
-                !isSelected && !isToday && "hover:bg-accent hover:text-accent-foreground",
+            <div key={i} className="relative">
+              <button
+                type="button"
+                className={cn(
+                  "inline-flex h-8 w-8 items-center justify-center rounded p-0 text-sm font-normal",
+                  isCurrentMonth ? "text-foreground" : "text-muted-foreground",
+                  isToday && "bg-accent text-accent-foreground",
+                  isSelected && "bg-primary text-primary-foreground",
+                  !isSelected && !isToday && "hover:bg-accent hover:text-accent-foreground",
+                )}
+                onClick={() => onSelect(date)}
+                disabled={!isCurrentMonth}
+              >
+                {date.getDate()}
+              </button>
+              {isCurrentMonth && (
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-primary/10 hover:bg-primary/20"
+                  onClick={(e) => handleAddButtonClick(date, e)}
+                >
+                  <Plus className="h-2 w-2" />
+                </Button>
               )}
-              onClick={() => onSelect(date)}
-              disabled={!isCurrentMonth}
-            >
-              {date.getDate()}
-            </button>
+            </div>
           )
         })}
       </div>
