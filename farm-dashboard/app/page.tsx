@@ -67,8 +67,8 @@ export default function LandingPage() {
             Everything you need to manage your agricultural business efficiently
           </p>
         </div>
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <div className="rounded-lg border bg-card p-6 shadow-sm">
+        <div className="w-full flex items-center justify-center flex-wrap gap-10">
+          <div className="rounded-lg w-72 border bg-card p-6 shadow-sm">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
               <Tractor className="h-6 w-6 text-green-600" />
             </div>
@@ -77,14 +77,14 @@ export default function LandingPage() {
               Track all your farms, fields, and crops in one centralized dashboard.
             </p>
           </div>
-          <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="rounded-lg w-72 border bg-card p-6 shadow-sm">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
               <Calendar className="h-6 w-6 text-green-600" />
             </div>
             <h3 className="mb-2 text-xl font-bold">Task Scheduling</h3>
             <p className="text-muted-foreground">Create and assign tasks to your team with deadlines and priorities.</p>
           </div>
-          <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="rounded-lg w-72 border bg-card p-6 shadow-sm">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
               <BarChart3 className="h-6 w-6 text-green-600" />
             </div>
@@ -93,7 +93,7 @@ export default function LandingPage() {
               Visualize your farms performance with interactive charts and reports.
             </p>
           </div>
-          <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="rounded-lg w-72 border bg-card p-6 shadow-sm">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
               <CheckCircle className="h-6 w-6 text-green-600" />
             </div>
@@ -102,7 +102,7 @@ export default function LandingPage() {
               Monitor the progress of all your agricultural projects in real-time.
             </p>
           </div>
-          <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="rounded-lg w-72 border bg-card p-6 shadow-sm">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
               <MapPin className="h-6 w-6 text-green-600" />
             </div>
@@ -111,7 +111,7 @@ export default function LandingPage() {
               Visualize your fields and track crop rotation and planting schedules.
             </p>
           </div>
-          <div className="rounded-lg border bg-card p-6 shadow-sm">
+          <div className="rounded-lg w-72 border bg-card p-6 shadow-sm">
             <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
               <Leaf className="h-6 w-6 text-green-600" />
             </div>
