@@ -1,5 +1,3 @@
-"use client";
-
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -18,9 +16,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Form, FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/components/ui/form";
 import { z } from "zod";
 import { toast } from "sonner";
-import { ToastStyles } from "@/lib/utils";
+import { fetcher, ToastStyles } from "@/lib/utils";
 import axiosInstance from "@/app/helper/axiosInstance";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
+import useSWR from "swr";
+import { PaginatedFarmsResponse } from "@/app/dashboard/farms/FarmComponent";
+import { User } from "./edit-task-dialog";
 
 const fieldSchema = z.object({
     name: z.string().min(1, "Field name is required"),
@@ -32,15 +33,17 @@ const fieldSchema = z.object({
         .refine((file) => file.size < 5 * 1024 * 1024, "Max image size is 5MB"),
 });
 
-
-
-
 type FieldFormData = z.infer<typeof fieldSchema>;
 
 export function FieldCreateDialog() {
+    const { data, isLoading: managerLoading } = useSWR<PaginatedFarmsResponse<User>>(
+        `/user/list?limit=${100}`,
+        fetcher
+    );
+    const managers = data?.results ?? [];
     const [open, setOpen] = useState(false);
     const [preview, setPreview] = useState<string | null>(null);
-    const { id } = useParams()
+    const { id } = useParams();
     const form = useForm<FieldFormData>({
         resolver: zodResolver(fieldSchema),
         defaultValues: {
@@ -55,7 +58,7 @@ export function FieldCreateDialog() {
     const onSubmit = async (data: FieldFormData) => {
         try {
             const formData = new FormData();
-            formData.append('farm', id as string)
+            formData.append('farm', id as string);
             Object.entries(data).forEach(([key, value]) => {
                 if (key === "image" && value instanceof File) {
                     formData.append("image", value);
@@ -65,12 +68,12 @@ export function FieldCreateDialog() {
             });
 
             console.log("Form Submitted:", data);
-            const response = await axiosInstance.post('/field/create', formData)
-            console.log(response)
-
-            toast.success('Created Field', ToastStyles.success)
+            const response = await axiosInstance.post('/field/create', formData);
+            console.log(response);
+            window.location.reload()
+            toast.success('Created Field', ToastStyles.success);
         } catch (error) {
-            toast.error('Failed to create field', ToastStyles.error)
+            toast.error('Failed to create field', ToastStyles.error);
         } finally {
             setOpen(false);
         }
@@ -116,9 +119,19 @@ export function FieldCreateDialog() {
                                 name="managerId"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>Manager ID</FormLabel>
+                                        <FormLabel>Manager</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="user-123" {...field} />
+                                            <select
+                                                {...field}
+                                                className="border p-2 rounded-md w-full"
+                                            >
+                                                <option value="">Select Manager</option>
+                                                {managers.map((manager) => (
+                                                    <option key={manager.id} value={manager.id}>
+                                                        {manager.email} ({manager.id})
+                                                    </option>
+                                                ))}
+                                            </select>
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>

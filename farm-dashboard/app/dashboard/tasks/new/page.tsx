@@ -70,7 +70,8 @@ export default function NewTaskPage() {
     try {
       const formattedValues = {
         ...values,
-        deadline: values.deadline.toISOString().split("T")[0],
+        // Ensure the deadline is in YYYY-MM-DD format using toLocaleDateString
+        deadline: values.deadline?.toLocaleDateString('en-CA'), // 'en-CA' gives YYYY-MM-DD format
         type: isHarvest ? "harvest" : "maintenance", // ✅ Add type
       }
 
@@ -85,6 +86,7 @@ export default function NewTaskPage() {
       setIsHarvest(false)
     }
   }
+
 
   const handleFarmChange = async () => {
     try {

@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import { toast } from "sonner"
 import { Edit, MoreHorizontal, Trash } from "lucide-react"
 
@@ -19,8 +18,8 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PaginatedFarmsResponse } from "@/app/dashboard/farms/FarmComponent"
-import { CamelCaseToSnakeCase, ToastStyles } from "@/lib/utils"
-import { JoinedTask, Task } from "@/app/types/farm.types"
+import { ToastStyles } from "@/lib/utils"
+import { JoinedTask } from "@/app/types/farm.types"
 import axiosInstance from "@/app/helper/axiosInstance"
 import { EditTaskDialog } from "../edit-task-dialog"
 

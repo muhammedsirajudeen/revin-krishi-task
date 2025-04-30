@@ -38,18 +38,6 @@ export function DashboardNav({ setOpen }: NavProps) {
       active: pathname === "/dashboard/farms",
     },
     {
-      label: "Fields",
-      icon: MapPin,
-      href: "/dashboard/fields",
-      active: pathname === "/dashboard/fields",
-    },
-    {
-      label: "Crops",
-      icon: Leaf,
-      href: "/dashboard/crops",
-      active: pathname === "/dashboard/crops",
-    },
-    {
       label: "Tasks",
       icon: CheckSquare,
       href: "/dashboard/tasks",

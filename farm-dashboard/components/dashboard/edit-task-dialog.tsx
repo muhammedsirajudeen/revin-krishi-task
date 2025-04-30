@@ -150,13 +150,13 @@ export function EditTaskDialog({ open, setOpen, task, onSuccess, mutate }: EditT
         try {
             const payload = {
                 ...values,
-                deadline: values.deadline.toISOString().split("T")[0],
+                deadline: format(values.deadline, "yyyy-MM-dd"), // Ensure it's formatted as YYYY-MM-DD
                 type: isHarvest ? "harvest" : "maintenance",
             };
 
             await axiosInstance.patch(`/task/update/${task.id}`, payload);
             toast.success("Task updated!", ToastStyles.success);
-            mutate()
+            mutate();
             if (onSuccess) onSuccess();
             setOpen(false);
         } catch (error) {

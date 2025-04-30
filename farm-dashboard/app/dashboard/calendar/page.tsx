@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { toast } from "sonner"
-import { CalendarIcon, ChevronLeft, ChevronRight, Plus } from "lucide-react"
+import { AlertCircle, CalendarIcon, CheckCircle2, ChevronLeft, ChevronRight, Flag, Mail, MapPin, Plus, User } from "lucide-react"
 import { addDays, format, startOfToday } from "date-fns"
 
 import { Button } from "@/components/ui/button"
@@ -20,58 +20,68 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { cn } from "@/lib/utils"
+import { cn, fetcher } from "@/lib/utils"
+import useSWR from "swr"
+import { PaginatedFarmsResponse } from "../farms/FarmComponent"
+import { JoinedTask } from "@/app/types/farm.types"
+import { Badge } from "@/components/ui/badge"
+import { Separator } from "@/components/ui/separator"
 
 // Sample data
-const events = [
-  {
-    id: 1,
-    title: "Irrigation check for Field A",
-    date: addDays(startOfToday(), 1).toISOString(),
-    type: "task",
-    status: "pending",
-  },
-  {
-    id: 2,
-    title: "Apply fertilizer to corn crops",
-    date: addDays(startOfToday(), 2).toISOString(),
-    type: "task",
-    status: "in-progress",
-  },
-  {
-    id: 3,
-    title: "Harvest wheat in Field C",
-    date: addDays(startOfToday(), 5).toISOString(),
-    type: "harvest",
-    status: "pending",
-  },
-  {
-    id: 4,
-    title: "Repair tractor #3",
-    date: addDays(startOfToday(), -1).toISOString(),
-    type: "maintenance",
-    status: "completed",
-  },
-  {
-    id: 5,
-    title: "Pest control in Field D",
-    date: addDays(startOfToday(), 3).toISOString(),
-    type: "task",
-    status: "in-progress",
-  },
-  {
-    id: 6,
-    title: "Team meeting",
-    date: startOfToday().toISOString(),
-    type: "meeting",
-    status: "pending",
-  },
-]
+// const events = [
+//   {
+//     id: 1,
+//     title: "Irrigation check for Field A",
+//     date: addDays(startOfToday(), 1).toISOString(),
+//     type: "task",
+//     status: "pending",
+//   },
+//   {
+//     id: 2,
+//     title: "Apply fertilizer to corn crops",
+//     date: addDays(startOfToday(), 2).toISOString(),
+//     type: "task",
+//     status: "in-progress",
+//   },
+//   {
+//     id: 3,
+//     title: "Harvest wheat in Field C",
+//     date: addDays(startOfToday(), 5).toISOString(),
+//     type: "harvest",
+//     status: "pending",
+//   },
+//   {
+//     id: 4,
+//     title: "Repair tractor #3",
+//     date: addDays(startOfToday(), -1).toISOString(),
+//     type: "maintenance",
+//     status: "completed",
+//   },
+//   {
+//     id: 5,
+//     title: "Pest control in Field D",
+//     date: addDays(startOfToday(), 3).toISOString(),
+//     type: "task",
+//     status: "in-progress",
+//   },
+//   {
+//     id: 6,
+//     title: "Team meeting",
+//     date: startOfToday().toISOString(),
+//     type: "meeting",
+//     status: "pending",
+//   },
+// ]
 
 export default function CalendarPage() {
+  const { data: events, isLoading, mutate } = useSWR<PaginatedFarmsResponse<JoinedTask>>(
+    `/task/list?limit=${100}`,
+    fetcher
+  )
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(startOfToday())
   const [currentMonth, setCurrentMonth] = useState(startOfToday())
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [selectedEventDetails, setSelectedEventDetails] = useState<JoinedTask | null>(null)
 
   const daysInMonth = Array.from({ length: 35 }, (_, i) => {
     const date = new Date(currentMonth)
@@ -98,9 +108,19 @@ export default function CalendarPage() {
     setIsDialogOpen(false)
   }
 
+  const handleDateClick = (date: Date) => {
+    setSelectedDate(date)
+    const eventsForDate = getEventsForDate(date) ?? []
+    if (eventsForDate.length > 0) {
+      // If there are events, you can set the first one as the default event to show
+      setSelectedEventDetails(eventsForDate[0])
+      setIsDialogOpen(true)
+    }
+  }
+
   const getEventsForDate = (date: Date) => {
-    return events.filter((event) => {
-      const eventDate = new Date(event.date)
+    return events?.results.filter((event) => {
+      const eventDate = new Date(event.deadline)
       return (
         eventDate.getDate() === date.getDate() &&
         eventDate.getMonth() === date.getMonth() &&
@@ -123,71 +143,36 @@ export default function CalendarPage() {
         return "bg-gray-100 text-gray-800 border-gray-200"
     }
   }
+  const getPriorityVariant = (priority: string) => {
+    switch (priority.toLowerCase()) {
+      case "high":
+        return "destructive"
+      case "medium":
+        return "warning"
+      default:
+        return "secondary"
+    }
+  }
+
+  // Function to get badge variant based on status
+  const getStatusVariant = (status: string) => {
+    switch (status.toLowerCase()) {
+      case "completed":
+        return "success"
+      case "in progress":
+        return "warning"
+      case "pending":
+        return "outline"
+      default:
+        return "secondary"
+    }
+  }
+
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold tracking-tight">Calendar</h1>
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Event
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Add New Event</DialogTitle>
-              <DialogDescription>Create a new event or task on the calendar</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="title">Title</Label>
-                <Input id="title" placeholder="Enter event title" />
-              </div>
-              <div className="grid gap-2">
-                <Label>Date</Label>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !selectedDate && "text-muted-foreground",
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {selectedDate ? format(selectedDate, "PPP") : <span>Pick a date</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar mode="single" selected={selectedDate} onSelect={setSelectedDate} initialFocus />
-                  </PopoverContent>
-                </Popover>
-              </div>
-              <div className="grid gap-2">
-                <Label>Event Type</Label>
-                <Select>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select event type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="task">Task</SelectItem>
-                    <SelectItem value="harvest">Harvest</SelectItem>
-                    <SelectItem value="maintenance">Maintenance</SelectItem>
-                    <SelectItem value="meeting">Meeting</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                Cancel
-              </Button>
-              <Button onClick={handleAddEvent}>Add Event</Button>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
       </div>
 
       <Card>
@@ -219,7 +204,7 @@ export default function CalendarPage() {
             {daysInMonth.map((date, i) => {
               const isCurrentMonth = date.getMonth() === currentMonth.getMonth()
               const isToday = date.toDateString() === new Date().toDateString()
-              const dateEvents = getEventsForDate(date)
+              const dateEvents = getEventsForDate(date) ?? []
 
               return (
                 <div
@@ -254,6 +239,7 @@ export default function CalendarPage() {
                           getEventTypeColor(event.type),
                         )}
                         title={event.title}
+                        onClick={() => handleDateClick(date)}
                       >
                         {event.title}
                       </div>
@@ -268,6 +254,79 @@ export default function CalendarPage() {
           </div>
         </CardContent>
       </Card>
+
+      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+        <DialogTrigger asChild>
+          <Button variant="outline">View Event Details</Button>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-md md:max-w-lg">
+          {selectedEventDetails && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-xl">{selectedEventDetails.title}</DialogTitle>
+                <DialogDescription className="pt-2">{selectedEventDetails.description}</DialogDescription>
+              </DialogHeader>
+
+              <div className="mt-4 space-y-4">
+                <div className="flex flex-wrap gap-2">
+                  <Badge className="flex items-center gap-1">
+                    <Flag className="h-3 w-3" />
+                    {selectedEventDetails.priority} Priority
+                  </Badge>
+                  <Badge className="flex items-center gap-1">
+                    <CheckCircle2 className="h-3 w-3" />
+                    {selectedEventDetails.status}
+                  </Badge>
+                  <Badge variant="outline" className="flex items-center gap-1">
+                    <AlertCircle className="h-3 w-3" />
+                    {selectedEventDetails.type}
+                  </Badge>
+                </div>
+
+                <Separator />
+
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="flex items-start gap-2">
+                    {/* <Farm className="h-4 w-4 mt-0.5 text-muted-foreground" /> */}
+                    <div>
+                      <p className="text-sm font-medium">Farm</p>
+                      <p className="text-sm text-muted-foreground">{selectedEventDetails.farm.name}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2">
+                    <MapPin className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">Field</p>
+                      <p className="text-sm text-muted-foreground">{selectedEventDetails.field.name}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2">
+                    <User className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">Assigned to</p>
+                      <p className="text-xs text-muted-foreground">{selectedEventDetails.assigned_to.email}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-2">
+                    <Mail className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                    <div>
+                      <p className="text-sm font-medium">Created by</p>
+                      <p className="text-xs text-muted-foreground">{selectedEventDetails.created_by.email}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <DialogFooter className="mt-6">
+                <Button onClick={() => setIsDialogOpen(false)}>Close</Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

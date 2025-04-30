@@ -56,4 +56,5 @@ export interface JoinedTask extends Omit<CamelCaseToSnakeCase<Task>, "farm" | "f
     farm: Farm
     field: Field
     assigned_to: User
+    created_by: User
 }
