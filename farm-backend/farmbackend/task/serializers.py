@@ -43,6 +43,7 @@ class CreateTaskSerializer(serializers.ModelSerializer):
             "farm",
             "field",
             "assigned_to",
+            "type"
         ]
 
     def create(self, validated_data):
@@ -51,6 +52,20 @@ class CreateTaskSerializer(serializers.ModelSerializer):
             validated_data["created_by"] = request.user
         return super().create(validated_data)
     
+    def update(self, instance, validated_data):
+        # Update the task fields
+        instance.title = validated_data.get("title", instance.title)
+        instance.description = validated_data.get("description", instance.description)
+        instance.deadline = validated_data.get("deadline", instance.deadline)
+        instance.priority = validated_data.get("priority", instance.priority)
+        instance.farm = validated_data.get("farm", instance.farm)
+        instance.field = validated_data.get("field", instance.field)
+        instance.assigned_to = validated_data.get("assigned_to", instance.assigned_to)
+        instance.type = validated_data.get("type", instance.type)
+
+        # Save and return the updated task instance
+        instance.save()
+        return instance    
 
 class TaskListSerializer(serializers.ModelSerializer):
     farm = FarmSerializer(read_only=True)
@@ -72,6 +87,17 @@ class TaskListSerializer(serializers.ModelSerializer):
             'created_by',
             'created_at',
             'updated_at',
-            "status"
+            "status",
+            'type'
         ]
         read_only_fields = ['id', 'created_at', 'updated_at']
+
+class TaskStatusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ['status']  # only allow updating the 'status'
+        extra_kwargs = {
+            'status': {'required': True}
+        }
+
+

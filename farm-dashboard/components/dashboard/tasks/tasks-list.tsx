@@ -19,14 +19,19 @@ import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { PaginatedFarmsResponse } from "@/app/dashboard/farms/FarmComponent"
-import { CamelCaseToSnakeCase } from "@/lib/utils"
-import { JoinedTask } from "@/app/types/farm.types"
+import { CamelCaseToSnakeCase, ToastStyles } from "@/lib/utils"
+import { JoinedTask, Task } from "@/app/types/farm.types"
+import axiosInstance from "@/app/helper/axiosInstance"
+import { EditTaskDialog } from "../edit-task-dialog"
 
 interface TaskListProps {
   tasks: PaginatedFarmsResponse<JoinedTask>["results"]
+  mutate: () => void
 }
 
-export function TasksList({ tasks: initialTasks }: TaskListProps) {
+export function TasksList({ tasks: initialTasks, mutate }: TaskListProps) {
+  const [open, setOpen] = useState(false)
+  const [task, setTask] = useState<JoinedTask>()
   const [tasks, setTasks] = useState(initialTasks)
   useEffect(() => {
     setTasks(initialTasks)
@@ -45,14 +50,26 @@ export function TasksList({ tasks: initialTasks }: TaskListProps) {
     return matchesStatus && matchesSearch
   })
 
-  const handleStatusChange = (taskId: string, newStatus: string) => {
-    // setTasks(tasks.map((task) => (task.id === taskId ? { ...task, status: newStatus } : task)))
-    toast.success(`Task status updated to ${newStatus}`)
+  const handleStatusChange = async (taskId: string, newStatus: string) => {
+    try {
+      const response = await axiosInstance.patch(`/task/status/${taskId}`, { status: newStatus })
+      toast.success(`Task status updated to ${newStatus}`, ToastStyles.success)
+      mutate()
+    } catch (error) {
+      console.log(error)
+      toast.error('failed to update status', ToastStyles.error)
+    }
   }
 
-  const handleDeleteTask = (taskId: string) => {
-    setTasks(tasks.filter((task) => task.id !== taskId))
-    toast.success("Task deleted successfully")
+  const handleDeleteTask = async (taskId: string) => {
+    try {
+      await axiosInstance.delete(`/task/delete/${taskId}`)
+      toast.success("Task deleted successfully", ToastStyles.success)
+      mutate()
+    } catch (error) {
+      console.log(error)
+      toast.error('failed to delete tasks', ToastStyles.error)
+    }
   }
 
   const getStatusBadge = (status: string) => {
@@ -83,7 +100,8 @@ export function TasksList({ tasks: initialTasks }: TaskListProps) {
     }
   }
   const editHandler = (task: JoinedTask) => {
-
+    setOpen(true)
+    setTask(task)
   }
 
   return (
@@ -178,6 +196,7 @@ export function TasksList({ tasks: initialTasks }: TaskListProps) {
           </TableBody>
         </Table>
       </div>
+      <EditTaskDialog mutate={mutate} open={open} setOpen={setOpen} task={task} />
     </div>
   )
 }

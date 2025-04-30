@@ -10,7 +10,6 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 
-
 import { CamelCaseToSnakeCase, cn, fetcher, ToastStyles } from "@/lib/utils"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
@@ -20,6 +19,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Button } from "@/components/ui/button"
 import { Calendar } from "@/components/ui/calendar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Switch } from "@/components/ui/switch" // ✅ Import Switch
 import axiosInstance from "@/app/helper/axiosInstance"
 import useSWR from "swr"
 import { PaginatedFarmsResponse } from "../../farms/FarmComponent"
@@ -41,7 +41,8 @@ type TaskFormValues = z.infer<typeof taskSchema>
 export default function NewTaskPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const { data, isLoading: managerLoading, mutate } = useSWR<PaginatedFarmsResponse<User>>(
+  const [isHarvest, setIsHarvest] = useState(false) // ✅ Toggle state
+  const { data, isLoading: managerLoading } = useSWR<PaginatedFarmsResponse<User>>(
     `/user/list?limit=${100}`,
     fetcher
   )
@@ -50,7 +51,7 @@ export default function NewTaskPage() {
     fetcher
   )
   const [fields, setFields] = useState<Field[]>([])
-  console.log(farmData)
+
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
     defaultValues: {
@@ -67,13 +68,13 @@ export default function NewTaskPage() {
   const onSubmit = async (values: TaskFormValues) => {
     setIsLoading(true)
     try {
-      // Convert the date to yyyy-mm-dd format
       const formattedValues = {
         ...values,
-        deadline: values.deadline.toISOString().split("T")[0], // "YYYY-MM-DD"
+        deadline: values.deadline.toISOString().split("T")[0],
+        type: isHarvest ? "harvest" : "maintenance", // ✅ Add type
       }
 
-      const response = await axiosInstance.post('/task/add', formattedValues)
+      await axiosInstance.post('/task/add', formattedValues)
       toast.success("Task created successfully!", ToastStyles.success)
       router.push("/dashboard/tasks")
     } catch {
@@ -81,15 +82,14 @@ export default function NewTaskPage() {
     } finally {
       setIsLoading(false)
       form.reset()
+      setIsHarvest(false)
     }
   }
 
   const handleFarmChange = async () => {
     try {
-      console.log(form.getValues().farm)
       const farmId = form.getValues().farm
       const response = await axiosInstance.get(`field/farm/${farmId}?limit=100`)
-      console.log(response)
       setFields(response.data.results)
     } catch (error) {
       console.log(error)
@@ -210,8 +210,8 @@ export default function NewTaskPage() {
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Assign to Farm</FormLabel>
-                      <Select onValueChange={(args) => {
-                        field.onChange(args)
+                      <Select onValueChange={(value) => {
+                        field.onChange(value)
                         handleFarmChange()
                       }} defaultValue={field.value}>
                         <FormControl>
@@ -221,11 +221,9 @@ export default function NewTaskPage() {
                         </FormControl>
                         <SelectContent>
                           {
-                            farmData?.results.map((result) => {
-                              return (
-                                <SelectItem key={result.id} value={result.id}>{result.name}</SelectItem>
-                              )
-                            })
+                            farmData?.results.map((result) => (
+                              <SelectItem key={result.id} value={result.id}>{result.name}</SelectItem>
+                            ))
                           }
                         </SelectContent>
                       </Select>
@@ -249,11 +247,9 @@ export default function NewTaskPage() {
                         </FormControl>
                         <SelectContent>
                           {
-                            fields.map((field) => {
-                              return (
-                                <SelectItem key={field.id} value={field.id}>{field.name}</SelectItem>
-                              )
-                            })
+                            fields.map((field) => (
+                              <SelectItem key={field.id} value={field.id}>{field.name}</SelectItem>
+                            ))
                           }
                         </SelectContent>
                       </Select>
@@ -289,7 +285,13 @@ export default function NewTaskPage() {
                 )}
               />
 
+              {/* ✅ Harvest Toggle */}
+              <div className="flex items-center gap-4 pt-4">
+                <FormLabel className="text-base">Is Harvest Task?</FormLabel>
+                <Switch checked={isHarvest} onCheckedChange={setIsHarvest} />
+              </div>
             </CardContent>
+
             <CardFooter className="flex justify-between">
               <Button type="button" variant="outline" onClick={() => router.back()}>
                 Cancel

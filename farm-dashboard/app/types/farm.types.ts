@@ -50,6 +50,7 @@ export interface Task {
     field: string
     assignedTo: string
     status: string
+    type: string
 }
 export interface JoinedTask extends Omit<CamelCaseToSnakeCase<Task>, "farm" | "field" | "assigned_to"> {
     farm: Farm

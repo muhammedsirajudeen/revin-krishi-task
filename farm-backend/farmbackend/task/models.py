@@ -17,7 +17,7 @@ class Task(models.Model):
     description = models.TextField(blank=True)
     deadline = models.DateField(null=True, blank=True)
     priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
-
+    type=models.TextField(blank=True,default='maintenance')
     farm = models.ForeignKey(Farm, on_delete=models.CASCADE, related_name="tasks")
     field = models.ForeignKey(Field, on_delete=models.CASCADE, related_name="tasks")
     assigned_to = models.ForeignKey(User, on_delete=models.CASCADE, related_name="assigned_tasks")

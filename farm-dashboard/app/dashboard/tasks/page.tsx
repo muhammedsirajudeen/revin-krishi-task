@@ -15,9 +15,10 @@ import { JoinedTask } from "@/app/types/farm.types"
 
 export default function TasksPage() {
   const [page, setPage] = useState(1)
-  const { data, isLoading } = useSWR<PaginatedFarmsResponse<JoinedTask>>(
+  const { data, isLoading, mutate } = useSWR<PaginatedFarmsResponse<JoinedTask>>(
     `/task/list?page=${page}`,
     fetcher
+
   )
 
   const totalPages = data?.count ? Math.ceil(data.count / data.results.length) : 1
@@ -43,10 +44,9 @@ export default function TasksPage() {
           <Tabs defaultValue="list" className="space-y-4">
             <TabsList>
               <TabsTrigger value="list">List View</TabsTrigger>
-              <TabsTrigger value="kanban">Kanban View</TabsTrigger>
             </TabsList>
             <TabsContent value="list">
-              <TasksList tasks={data?.results ?? []} />
+              <TasksList mutate={mutate} tasks={data?.results ?? []} />
               <div className="flex justify-between items-center mt-4">
                 <Button
                   variant="outline"
