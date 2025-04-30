@@ -67,7 +67,9 @@ export default function NewTaskPage() {
     if (window) {
       const date = window.localStorage.getItem('current-date')
       console.log(date)
-      form.setValue("deadline", new Date(date ?? ""))
+      if (date) {
+        form.setValue("deadline", new Date(date ?? ""))
+      }
     }
   }, [form])
   const onSubmit = async (values: TaskFormValues) => {
