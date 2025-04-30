@@ -14,8 +14,6 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Field } from "react-hook-form"
 import FieldByFarm from "@/components/dashboard/field-by-farm"
-import { useState } from "react"
-import CropAddDialog from "@/components/dashboard/crop-add-dialog"
 import { PaginatedFarmsResponse } from "../FarmComponent"
 
 export default function IndividualPage() {
@@ -24,7 +22,7 @@ export default function IndividualPage() {
         `/farm/list/${id}`,
         fetcher,
     )
-    const { data: fieldData, isLoading: fieldLoading, mutate } = useSWR<PaginatedFarmsResponse<CamelCaseToSnakeCase<Field>>>(
+    const { data: fieldData } = useSWR<PaginatedFarmsResponse<CamelCaseToSnakeCase<Field>>>(
         id ? `/field/farm/${id}` : null,
         fetcher,
     )

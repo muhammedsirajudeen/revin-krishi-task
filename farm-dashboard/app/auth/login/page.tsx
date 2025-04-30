@@ -39,6 +39,7 @@ export default function LoginPage() {
       toast.success('Login success', ToastStyles.success)
       router.push('/dashboard')
     } catch (error) {
+      console.log(error)
       toast.error("Login failed", ToastStyles.error)
     } finally {
       setIsLoading(false)

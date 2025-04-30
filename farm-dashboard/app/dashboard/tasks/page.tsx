@@ -8,14 +8,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { TasksList } from "@/components/dashboard/tasks/tasks-list"
-import { TasksKanban } from "@/components/dashboard/tasks/tasks-kanban"
 import { PaginatedFarmsResponse } from "../farms/FarmComponent"
 import { fetcher } from "@/lib/utils"
 import { JoinedTask } from "@/app/types/farm.types"
 
 export default function TasksPage() {
   const [page, setPage] = useState(1)
-  const { data, isLoading, mutate } = useSWR<PaginatedFarmsResponse<JoinedTask>>(
+  const { data, mutate } = useSWR<PaginatedFarmsResponse<JoinedTask>>(
     `/task/list?page=${page}`,
     fetcher
 

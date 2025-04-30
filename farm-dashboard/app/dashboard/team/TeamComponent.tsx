@@ -1,6 +1,5 @@
 'use client'
 
-import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import useSWR from "swr"
 import { AddMemberDialog } from "@/components/dashboard/add-team-member"
@@ -12,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { ChevronLeft, ChevronRight, Plus, RefreshCw, UserPlus } from 'lucide-react'
+import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
 
 export default function TeamComponent() {
     const router = useRouter()

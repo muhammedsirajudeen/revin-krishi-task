@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import * as z from "zod"
 
-import { CamelCaseToSnakeCase, cn, fetcher, ToastStyles } from "@/lib/utils"
+import { cn, fetcher, ToastStyles } from "@/lib/utils"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
@@ -42,11 +42,11 @@ export default function NewTaskPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isHarvest, setIsHarvest] = useState(false) // ✅ Toggle state
-  const { data, isLoading: managerLoading } = useSWR<PaginatedFarmsResponse<User>>(
+  const { data } = useSWR<PaginatedFarmsResponse<User>>(
     `/user/list?limit=${100}`,
     fetcher
   )
-  const { data: farmData, isLoading: farmLoading } = useSWR<PaginatedFarmsResponse<Farm>>(
+  const { data: farmData } = useSWR<PaginatedFarmsResponse<Farm>>(
     `/farm/list/owner?limit=${100}`,
     fetcher
   )
@@ -69,7 +69,7 @@ export default function NewTaskPage() {
       console.log(date)
       form.setValue("deadline", new Date(date ?? ""))
     }
-  }, [])
+  }, [form])
   const onSubmit = async (values: TaskFormValues) => {
     setIsLoading(true)
     try {

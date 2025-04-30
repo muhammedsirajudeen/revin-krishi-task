@@ -1,9 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { toast } from "sonner"
-import { AlertCircle, CalendarIcon, CheckCircle2, ChevronLeft, ChevronRight, Flag, Mail, MapPin, Plus, User } from "lucide-react"
-import { addDays, format, startOfToday } from "date-fns"
+import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, Flag, Mail, MapPin, Plus, User } from "lucide-react"
+import { format, startOfToday } from "date-fns"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -14,26 +13,19 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn, fetcher } from "@/lib/utils"
 import useSWR from "swr"
 import { PaginatedFarmsResponse } from "../farms/FarmComponent"
 import { JoinedTask } from "@/app/types/farm.types"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { useRouter } from "next/navigation"
 
 export default function CalendarPage() {
-  const { data: events, isLoading, mutate } = useSWR<PaginatedFarmsResponse<JoinedTask>>(
+  const { data: events } = useSWR<PaginatedFarmsResponse<JoinedTask>>(
     `/task/list?limit=${100}`,
     fetcher
   )
-  const router = useRouter()
   const [currentMonth, setCurrentMonth] = useState(startOfToday())
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedEventDetails, setSelectedEventDetails] = useState<JoinedTask | null>(null)
@@ -58,9 +50,7 @@ export default function CalendarPage() {
     setCurrentMonth(date)
   }
 
-  const handleAddEvent = () => {
-    toast.success("Event added successfully")
-  }
+
 
   const handleDateClick = (date: Date) => {
     const eventsForDate = getEventsForDate(date) ?? []
@@ -103,30 +93,7 @@ export default function CalendarPage() {
         return "bg-gray-100 text-gray-800 border-gray-200"
     }
   }
-  const getPriorityVariant = (priority: string) => {
-    switch (priority.toLowerCase()) {
-      case "high":
-        return "destructive"
-      case "medium":
-        return "warning"
-      default:
-        return "secondary"
-    }
-  }
 
-  // Function to get badge variant based on status
-  const getStatusVariant = (status: string) => {
-    switch (status.toLowerCase()) {
-      case "completed":
-        return "success"
-      case "in progress":
-        return "warning"
-      case "pending":
-        return "outline"
-      default:
-        return "secondary"
-    }
-  }
 
 
   return (
@@ -298,103 +265,103 @@ export default function CalendarPage() {
   )
 }
 
-// Calendar component for date selection
-function Calendar({
-  mode,
-  selected,
-  onSelect,
-  initialFocus,
-}: {
-  mode: "single"
-  selected?: Date
-  onSelect: (date: Date | undefined) => void
-  initialFocus?: boolean
-}) {
-  const [currentMonth, setCurrentMonth] = useState(startOfToday())
+// // Calendar component for date selection
+// function Calendar({
+//   mode,
+//   selected,
+//   onSelect,
+//   initialFocus,
+// }: {
+//   mode: "single"
+//   selected?: Date
+//   onSelect: (date: Date | undefined) => void
+//   initialFocus?: boolean
+// }) {
+//   const [currentMonth, setCurrentMonth] = useState(startOfToday())
 
-  const daysInMonth = Array.from({ length: 35 }, (_, i) => {
-    const date = new Date(currentMonth)
-    date.setDate(1)
-    const firstDayOfMonth = date.getDay()
-    date.setDate(i - firstDayOfMonth + 1)
-    return date
-  })
+//   const daysInMonth = Array.from({ length: 35 }, (_, i) => {
+//     const date = new Date(currentMonth)
+//     date.setDate(1)
+//     const firstDayOfMonth = date.getDay()
+//     date.setDate(i - firstDayOfMonth + 1)
+//     return date
+//   })
 
-  const handlePreviousMonth = () => {
-    const date = new Date(currentMonth)
-    date.setMonth(date.getMonth() - 1)
-    setCurrentMonth(date)
-  }
+//   const handlePreviousMonth = () => {
+//     const date = new Date(currentMonth)
+//     date.setMonth(date.getMonth() - 1)
+//     setCurrentMonth(date)
+//   }
 
-  const handleNextMonth = () => {
-    const date = new Date(currentMonth)
-    date.setMonth(date.getMonth() + 1)
-    setCurrentMonth(date)
-  }
+//   const handleNextMonth = () => {
+//     const date = new Date(currentMonth)
+//     date.setMonth(date.getMonth() + 1)
+//     setCurrentMonth(date)
+//   }
 
-  const handleAddButtonClick = (date: Date, e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent triggering the cell click event
-    console.log("Add event for date:", format(date, "yyyy-MM-dd"));
-  }
+//   const handleAddButtonClick = (date: Date, e: React.MouseEvent) => {
+//     e.stopPropagation(); // Prevent triggering the cell click event
+//     console.log("Add event for date:", format(date, "yyyy-MM-dd"));
+//   }
 
-  return (
-    <div className="p-3">
-      <div className="flex items-center justify-between">
-        <h2 className="text-sm font-medium">{format(currentMonth, "MMMM yyyy")}</h2>
-        <div className="flex items-center gap-1">
-          <Button variant="outline" size="icon" className="h-7 w-7" onClick={handlePreviousMonth}>
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="icon" className="h-7 w-7" onClick={handleNextMonth}>
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-      <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs">
-        <div className="p-1">S</div>
-        <div className="p-1">M</div>
-        <div className="p-1">T</div>
-        <div className="p-1">W</div>
-        <div className="p-1">T</div>
-        <div className="p-1">F</div>
-        <div className="p-1">S</div>
-      </div>
-      <div className="mt-1 grid grid-cols-7 gap-1">
-        {daysInMonth.map((date, i) => {
-          const isCurrentMonth = date.getMonth() === currentMonth.getMonth()
-          const isToday = date.toDateString() === new Date().toDateString()
-          const isSelected = selected?.toDateString() === date.toDateString()
+//   return (
+//     <div className="p-3">
+//       <div className="flex items-center justify-between">
+//         <h2 className="text-sm font-medium">{format(currentMonth, "MMMM yyyy")}</h2>
+//         <div className="flex items-center gap-1">
+//           <Button variant="outline" size="icon" className="h-7 w-7" onClick={handlePreviousMonth}>
+//             <ChevronLeft className="h-4 w-4" />
+//           </Button>
+//           <Button variant="outline" size="icon" className="h-7 w-7" onClick={handleNextMonth}>
+//             <ChevronRight className="h-4 w-4" />
+//           </Button>
+//         </div>
+//       </div>
+//       <div className="mt-3 grid grid-cols-7 gap-1 text-center text-xs">
+//         <div className="p-1">S</div>
+//         <div className="p-1">M</div>
+//         <div className="p-1">T</div>
+//         <div className="p-1">W</div>
+//         <div className="p-1">T</div>
+//         <div className="p-1">F</div>
+//         <div className="p-1">S</div>
+//       </div>
+//       <div className="mt-1 grid grid-cols-7 gap-1">
+//         {daysInMonth.map((date, i) => {
+//           const isCurrentMonth = date.getMonth() === currentMonth.getMonth()
+//           const isToday = date.toDateString() === new Date().toDateString()
+//           const isSelected = selected?.toDateString() === date.toDateString()
 
-          return (
-            <div key={i} className="relative">
-              <button
-                type="button"
-                className={cn(
-                  "inline-flex h-8 w-8 items-center justify-center rounded p-0 text-sm font-normal",
-                  isCurrentMonth ? "text-foreground" : "text-muted-foreground",
-                  isToday && "bg-accent text-accent-foreground",
-                  isSelected && "bg-primary text-primary-foreground",
-                  !isSelected && !isToday && "hover:bg-accent hover:text-accent-foreground",
-                )}
-                onClick={() => onSelect(date)}
-                disabled={!isCurrentMonth}
-              >
-                {date.getDate()}
-              </button>
-              {isCurrentMonth && (
-                <Button
-                  size="icon"
-                  variant="ghost"
-                  className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-primary/10 hover:bg-primary/20"
-                  onClick={(e) => handleAddButtonClick(date, e)}
-                >
-                  <Plus className="h-2 w-2" />
-                </Button>
-              )}
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
+//           return (
+//             <div key={i} className="relative">
+//               <button
+//                 type="button"
+//                 className={cn(
+//                   "inline-flex h-8 w-8 items-center justify-center rounded p-0 text-sm font-normal",
+//                   isCurrentMonth ? "text-foreground" : "text-muted-foreground",
+//                   isToday && "bg-accent text-accent-foreground",
+//                   isSelected && "bg-primary text-primary-foreground",
+//                   !isSelected && !isToday && "hover:bg-accent hover:text-accent-foreground",
+//                 )}
+//                 onClick={() => onSelect(date)}
+//                 disabled={!isCurrentMonth}
+//               >
+//                 {date.getDate()}
+//               </button>
+//               {isCurrentMonth && (
+//                 <Button
+//                   size="icon"
+//                   variant="ghost"
+//                   className="absolute -bottom-1 -right-1 h-4 w-4 rounded-full bg-primary/10 hover:bg-primary/20"
+//                   onClick={(e) => handleAddButtonClick(date, e)}
+//                 >
+//                   <Plus className="h-2 w-2" />
+//                 </Button>
+//               )}
+//             </div>
+//           )
+//         })}
+//       </div>
+//     </div>
+//   )
+// }

@@ -9,7 +9,7 @@ import { UpcomingHarvests } from "@/components/dashboard/upcoming-harvests"
 import { StatsCards } from "@/components/dashboard/stats-cards"
 import useSWR from "swr"
 import { fetcher } from "@/lib/utils"
-import { JoinedTask, Task } from "../types/farm.types"
+import { JoinedTask } from "../types/farm.types"
 
 export interface DashboardResponse {
   "farm": number,
@@ -24,7 +24,7 @@ export interface DashboardResponse {
 }
 
 export default function DashboardPage() {
-  const { data, isLoading } = useSWR<DashboardResponse>('/farm/summary', fetcher)
+  const { data } = useSWR<DashboardResponse>('/farm/summary', fetcher)
   console.log(data)
   return (
     <div className="flex flex-col gap-4">

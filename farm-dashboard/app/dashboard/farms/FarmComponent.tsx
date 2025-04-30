@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import useSWR from 'swr'
-import { Leaf, MapPin, Tractor, Wheat, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
+import { Leaf, MapPin, Wheat, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 
 import FarmCreationDialog from "@/components/dashboard/farm-create-dialog"
 import { CamelCaseToSnakeCase, fetcher } from '@/lib/utils'
@@ -37,13 +37,6 @@ export default function FarmPage() {
         if (data?.previous && page > 1) setPage(prev => prev - 1)
     }
 
-    const getFarmIcon = (farmName: string) => {
-        const name = farmName.toLowerCase()
-        if (name.includes('wheat') || name.includes('grain')) return Wheat
-        if (name.includes('tractor') || name.includes('machine')) return Tractor
-        return Leaf
-    }
-
     return (
         <div className="min-h-screen bg-gradient-to-b from-green-50 to-amber-50">
             <div className="container mx-auto p-6 space-y-8">
@@ -64,7 +57,6 @@ export default function FarmPage() {
                 ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                         {data?.results.map((farm) => {
-                            const FarmIcon = getFarmIcon(farm.name)
                             const customFarm = farm as unknown as CamelCaseToSnakeCase<Farm>
                             return (
                                 <Card key={farm.id} className="overflow-hidden border-green-200 hover:shadow-lg transition-all duration-300 bg-white">

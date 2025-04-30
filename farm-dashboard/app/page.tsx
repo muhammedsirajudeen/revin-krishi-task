@@ -90,7 +90,7 @@ export default function LandingPage() {
             </div>
             <h3 className="mb-2 text-xl font-bold">Analytics & Insights</h3>
             <p className="text-muted-foreground">
-              Visualize your farm's performance with interactive charts and reports.
+              Visualize your farms performance with interactive charts and reports.
             </p>
           </div>
           <div className="rounded-lg border bg-card p-6 shadow-sm">
