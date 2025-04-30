@@ -3,8 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import ListAPIView
-from .serializers import FarmSerializer,FarmListSerializer
-from .models import Farm
+from .serializers import FarmSerializer,FarmListSerializer,CropSerializer
+from .models import Farm,Crop
 from helper.custom_pagination import CustomPageNumberPagination
 from rest_framework.generics import RetrieveAPIView
 class FarmCreateView(APIView):
@@ -35,3 +35,9 @@ class FarmRetrieveView(RetrieveAPIView):
     queryset = Farm.objects.all()
     serializer_class = FarmSerializer
     lookup_field = 'id'
+
+class CropListView(ListAPIView):
+    permission_classes=[IsAuthenticated]
+    serializer_class=CropSerializer
+    pagination_class=CustomPageNumberPagination
+    queryset=Crop.objects.all()

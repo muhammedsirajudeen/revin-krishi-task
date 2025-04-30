@@ -14,6 +14,8 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import { Field } from "react-hook-form"
 import FieldByFarm from "@/components/dashboard/field-by-farm"
+import { useState } from "react"
+import CropAddDialog from "@/components/dashboard/crop-add-dialog"
 
 export default function IndividualPage() {
     const { id } = useParams()
@@ -21,7 +23,7 @@ export default function IndividualPage() {
         `/farm/list/${id}`,
         fetcher,
     )
-
+    // TODO: implement mutating stuff
     if (isLoading) {
         return (
             <div className="flex items-center justify-center h-64 bg-green-50/50">

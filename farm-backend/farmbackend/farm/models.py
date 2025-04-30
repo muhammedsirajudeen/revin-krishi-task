@@ -12,3 +12,12 @@ class Farm(models.Model):
 
     def __str__(self):
         return self.name
+
+
+class Crop(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
+    image = models.CharField(max_length=400)  # make sure MEDIA settings are configured
+
+    def __str__(self):
+        return self.crop_name

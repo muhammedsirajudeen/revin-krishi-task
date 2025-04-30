@@ -20,7 +20,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { ToastStyles } from "@/lib/utils";
 import axiosInstance from "@/app/helper/axiosInstance";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 const fieldSchema = z.object({
     name: z.string().min(1, "Field name is required"),

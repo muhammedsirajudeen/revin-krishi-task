@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Farm
+from .models import Farm,Crop
 from user.serializers import UserSerializer
 class FarmSerializer(serializers.ModelSerializer):
     class Meta:
@@ -27,3 +27,8 @@ class FarmListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Farm
         fields = ['id', 'name', 'location', 'size_in_acres', 'description', 'image', 'owner']
+
+class CropSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Crop
+        fields = ['id', 'name', 'image']

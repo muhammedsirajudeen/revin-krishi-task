@@ -20,6 +20,6 @@ class Field(models.Model):
     size_in_acres = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
     description = models.TextField(blank=True)
     image = models.FileField(upload_to='images/')  # Store in 'media/documents/'
-
+    crop=models.ForeignKey('farm.Crop',on_delete=models.CASCADE,related_name='crop',null=True,blank=True)
     def __str__(self):
         return self.name

@@ -1,3 +1,9 @@
+import { CamelCaseToSnakeCase } from "@/lib/utils";
+
+export interface User {
+    id: string
+    email: string
+}
 export interface Farm {
     id: string; // UUID or database ID
     name: string;
@@ -18,4 +24,16 @@ export interface Field {
     sizeInAcres: number; // optional
     description: string;
     image: string;
+    cropId: string
+}
+
+export interface Crop {
+    id: string;         // Unique identifier for the crop
+    name: string;       // Name of the crop (e.g., "Wheat", "Rice")
+    image: string;      // URL or path to the crop's image
+}
+
+export interface JoinedField extends Omit<CamelCaseToSnakeCase<Field>, "manager" | "farm" | "manager" | "crop_id"> {
+    crop: Crop
+    manager: User
 }
