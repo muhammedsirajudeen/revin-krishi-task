@@ -6,7 +6,10 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.views import APIView
 from rest_framework.exceptions import ValidationError
 from helper.fetch_google import GoogleLoginHelper
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny,IsAuthenticated
+from django.contrib.auth.hashers import make_password
+
+from .models import CustomUser
 
 class UserRegistrationView(generics.CreateAPIView):
     serializer_class = UserSerializer
@@ -86,3 +89,32 @@ class GoogleRegister(APIView):
             return Response({'message': str(ve)}, status=ve.status_code)
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class AddMember(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        email = request.data.get('email')
+        password = request.data.get('password')
+        role=request.data.get('role')
+        managed_by=request.user
+        if not email or not password or not role:
+            return Response({'error': 'Email and password and role are required'}, status=status.HTTP_400_BAD_REQUEST)
+
+        if role not in ["FarmWorker","FarmManager"]:
+            return Response({'error':'role should be either FarmWorker or FarmManager'},status=status.HTTP_400_BAD_REQUEST)
+
+        if CustomUser.objects.filter(email=email).exists():
+            return Response({'error': 'User with this email already exists'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = CustomUser.objects.create(
+                email=email,
+                password=make_password(password),
+                role=role,
+                managed_by=managed_by
+            )
+            return Response({'message': 'Member created successfully'}, status=status.HTTP_201_CREATED)
+        except ValidationError as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)

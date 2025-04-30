@@ -32,6 +32,7 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):
         choices=[('Owner', 'Owner'), ('FarmManager', 'FarmManager'),('FarmWorker','FarmWorker')],
         default='Owner'
     )
+    managed_by=models.ForeignKey('user.CustomUser',null=True,blank=True,on_delete=models.CASCADE)
     objects = CustomUserManager()
 
     USERNAME_FIELD = 'email'  # Use email to log in
