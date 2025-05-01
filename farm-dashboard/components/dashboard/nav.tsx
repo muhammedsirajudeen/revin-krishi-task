@@ -50,7 +50,7 @@ export function DashboardNav({ setOpen }: NavProps) {
   return (
     <nav className="grid gap-2 px-2">
       {routes.map((route) => (
-        <Link
+        <a
           key={route.href}
           href={route.href}
           onClick={() => {
@@ -66,7 +66,7 @@ export function DashboardNav({ setOpen }: NavProps) {
             <route.icon className="mr-2 h-5 w-5" />
             {route.label}
           </Button>
-        </Link>
+        </a>
       ))}
     </nav>
   )

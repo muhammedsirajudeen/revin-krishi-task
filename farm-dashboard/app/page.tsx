@@ -36,7 +36,7 @@ export default function LandingPage() {
       </header>
 
       {/* Hero Section */}
-      <section className="container flex flex-1 flex-col items-center justify-center gap-6 py-12 text-center md:py-20">
+      <section className="w-full flex items-center justify-center flex-col mt-20 gap-10">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
           Manage Your Farm <span className="text-green-600">Smarter</span>
         </h1>
@@ -60,7 +60,7 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section id="features" className="container py-12 md:py-20">
+      <section id="features" className="mt-10">
         <div className="mx-auto mb-12 max-w-[58rem] text-center">
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Powerful Features for Modern Farming</h2>
           <p className="mt-4 text-muted-foreground">
@@ -122,7 +122,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-green-50 py-12 md:py-20">
+      <section className="bg-green-50 flex items-center justify-center flex-col mt-4">
         <div className="container text-center">
           <h2 className="mb-4 text-3xl font-bold tracking-tight sm:text-4xl">
             Ready to transform your farm management?

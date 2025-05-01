@@ -58,6 +58,7 @@ export function AddMemberDialog() {
             console.log(response)
             toast.success('team member added successfully', ToastStyles.success)
             setOpen(false)
+            window.location.reload()
         } catch (error) {
             console.log(error)
             toast.error('team member failed to add', ToastStyles.error)
