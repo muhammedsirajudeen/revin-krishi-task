@@ -9,7 +9,7 @@ A full-stack agricultural project management platform designed for **Revin Techn
 Built with:
 - ⚙️ **Django REST Framework** (Backend)
 - ⚛️ **Next.js** (Frontend)
-- 🍃 **MongoDB** (Database)
+- 🍃 **Postgres** (Database)
 - 📊 **Chart.js / Recharts** (Visualization)
 
 ---
@@ -18,12 +18,12 @@ Built with:
 
 ```
 revin-krishi/
-├── backend/          # Django REST Framework APIs
+├── farm-backend/          # Django REST Framework APIs
 │   ├── models/       # MongoEngine models for Farms, Fields, Projects, Tasks
 │   ├── serializers/
 │   ├── views/
 │   └── urls.py
-├── frontend/         # Next.js frontend dashboard
+├── farm-dashboard/         # Next.js frontend dashboard
 │   ├── components/
 │   ├── pages/
 │   └── utils/
@@ -79,7 +79,7 @@ revin-krishi/
 
 ### 🔙 Backend (DRF + MongoDB)
 ```bash
-cd backend
+cd farm-backend
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
@@ -89,9 +89,9 @@ python manage.py runserver
 
 ### 🔜 Frontend (Next.js)
 ```bash
-cd frontend
-npm install
-npm run dev
+cd farm-dashboard
+pnpm install
+pnpm run dev
 ```
 
 ---
@@ -121,29 +121,16 @@ npm run dev
 
 ## 🎥 Demo & Slides
 
-- 🔗 [Demo Video](#)
-- 📑 [Presentation Slides](#)
+- 🔗 [Demo Video](https://youtu.be/0n1xrnRJNFg)
+- 📑 [Presentation Slides](https://youtu.be/QBIlkYHYtFY)
 
 ---
 
-## 💼 About the Company
 
-**Revin Techno Solutions Pvt. Ltd.**  
-Technology Innovation Foundation of IIT Palakkad (TECHIN)  
-V Square Building, Kanjikode, Pudussery Central, Kerala - 678623  
-🌐 [www.revinkrishi.com](http://www.revinkrishi.com)
-
----
 
 ## 🙌 Acknowledgement
 
 Thank you for the opportunity to demonstrate my skills and creativity.  
 Looking forward to contributing to the vision of **Revin Krishi**.
-
----
-
-**All the best to fellow developers! 🚜**
-
-
 
 ---
