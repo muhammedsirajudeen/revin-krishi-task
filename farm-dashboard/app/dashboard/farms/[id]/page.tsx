@@ -3,7 +3,7 @@
 import type { Farm } from "@/app/types/farm.types"
 import { FieldCreateDialog } from "@/components/dashboard/field-create-dialog"
 import { fetcher } from "@/lib/utils"
-import { useParams } from "next/navigation"
+import { useParams, useRouter } from "next/navigation"
 import useSWR from "swr"
 import type { CamelCaseToSnakeCase } from "@/lib/utils"
 import { MapPin, Ruler, FileText, Tractor, Wheat, Cloud, Leaf, ArrowLeft, Loader2 } from "lucide-react"
@@ -15,6 +15,8 @@ import Link from "next/link"
 import { Field } from "react-hook-form"
 import FieldByFarm from "@/components/dashboard/field-by-farm"
 import { PaginatedFarmsResponse } from "../FarmComponent"
+import { useEffect, useState } from "react"
+import axiosInstance from "@/app/helper/axiosInstance"
 
 export default function IndividualPage() {
     const { id } = useParams()
@@ -26,6 +28,35 @@ export default function IndividualPage() {
         id ? `/field/farm/${id}` : null,
         fetcher,
     )
+    const [loading, setLoading] = useState(true)
+    const router = useRouter()
+    useEffect(() => {
+        async function userVerifier() {
+            try {
+                const response = await axiosInstance.post('/user/token/verify',
+                    {
+                        token: window.localStorage.getItem('token')
+                    }
+                )
+                console.log(response)
+                setLoading(false)
+            } catch (error) {
+                console.log(error)
+                router.push('/auth/login')
+            }
+        }
+        userVerifier()
+
+    }, [])
+    console.log(data)
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <div className="w-8 h-8 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+            </div>
+        );
+    }
+
     // TODO: implement mutating stuff
     if (isLoading) {
         return (
@@ -37,6 +68,8 @@ export default function IndividualPage() {
             </div>
         )
     }
+
+
 
     if (!data) {
         return (

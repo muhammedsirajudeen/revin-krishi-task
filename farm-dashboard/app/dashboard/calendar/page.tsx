@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { AlertCircle, CheckCircle2, ChevronLeft, ChevronRight, Flag, Mail, MapPin, Plus, User } from "lucide-react"
 import { format, startOfToday } from "date-fns"
 
@@ -20,6 +20,8 @@ import { PaginatedFarmsResponse } from "../farms/FarmComponent"
 import { JoinedTask } from "@/app/types/farm.types"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
+import axiosInstance from "@/app/helper/axiosInstance"
+import { useRouter } from "next/navigation"
 
 export default function CalendarPage() {
   const { data: events } = useSWR<PaginatedFarmsResponse<JoinedTask>>(
@@ -29,7 +31,8 @@ export default function CalendarPage() {
   const [currentMonth, setCurrentMonth] = useState(startOfToday())
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [selectedEventDetails, setSelectedEventDetails] = useState<JoinedTask | null>(null)
-
+  const [loading, setLoading] = useState(true)
+  const router = useRouter()
   const daysInMonth = Array.from({ length: 35 }, (_, i) => {
     const date = new Date(currentMonth)
     date.setDate(1)
@@ -92,6 +95,31 @@ export default function CalendarPage() {
       default:
         return "bg-gray-100 text-gray-800 border-gray-200"
     }
+  }
+  useEffect(() => {
+    async function userVerifier() {
+      try {
+        const response = await axiosInstance.post('/user/token/verify',
+          {
+            token: window.localStorage.getItem('token')
+          }
+        )
+        console.log(response)
+        setLoading(false)
+      } catch (error) {
+        console.log(error)
+        router.push('/auth/login')
+      }
+    }
+    userVerifier()
+
+  }, [])
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="w-8 h-8 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+      </div>
+    );
   }
 
 

@@ -29,6 +29,7 @@ export interface DashboardResponse {
 export default function DashboardPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(true)
+  const { data } = useSWR<DashboardResponse>('/farm/summary', fetcher)
   useEffect(() => {
     async function userVerifier() {
       try {
@@ -47,7 +48,6 @@ export default function DashboardPage() {
     userVerifier()
 
   }, [])
-  const { data } = useSWR<DashboardResponse>('/farm/summary', fetcher)
   console.log(data)
   if (loading) {
     return (

@@ -12,12 +12,14 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
 import { ChevronLeft, ChevronRight, RefreshCw } from 'lucide-react'
+import { useEffect, useState } from "react"
+import axiosInstance from "@/app/helper/axiosInstance"
 
 export default function TeamComponent() {
     const router = useRouter()
     const searchParams = useSearchParams()
     const currentPage = Number(searchParams.get("page") || "1")
-
+    const [loading, setLoading] = useState(true)
     const { data, isLoading, mutate } = useSWR<PaginatedFarmsResponse<User>>(
         `/user/list?page=${currentPage}`,
         fetcher
@@ -44,6 +46,32 @@ export default function TeamComponent() {
             default:
                 return 'bg-gray-100 text-gray-800 hover:bg-gray-100'
         }
+    }
+    useEffect(() => {
+        async function userVerifier() {
+            try {
+                const response = await axiosInstance.post('/user/token/verify',
+                    {
+                        token: window.localStorage.getItem('token')
+                    }
+                )
+                console.log(response)
+                setLoading(false)
+            } catch (error) {
+                console.log(error)
+                router.push('/auth/login')
+            }
+        }
+        userVerifier()
+
+    }, [])
+    console.log(data)
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <div className="w-8 h-8 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+            </div>
+        );
     }
 
     return (

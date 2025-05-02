@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import useSWR from 'swr'
 import { Leaf, MapPin, Wheat, ChevronDown, ChevronUp, Loader2 } from 'lucide-react'
 
@@ -12,6 +12,7 @@ import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/componen
 import { Badge } from '@/components/ui/badge'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+import axiosInstance from '@/app/helper/axiosInstance'
 
 export type PaginatedFarmsResponse<T> = {
     count: number
@@ -22,6 +23,7 @@ export type PaginatedFarmsResponse<T> = {
 
 export default function FarmPage() {
     const [page, setPage] = useState(1)
+    const [loading, setLoading] = useState(true)
     const PAGE_SIZE = 6
     const router = useRouter()
     const { data, isLoading } = useSWR<PaginatedFarmsResponse<Farm>>(
@@ -35,6 +37,32 @@ export default function FarmPage() {
 
     const handlePrevPage = () => {
         if (data?.previous && page > 1) setPage(prev => prev - 1)
+    }
+    useEffect(() => {
+        async function userVerifier() {
+            try {
+                const response = await axiosInstance.post('/user/token/verify',
+                    {
+                        token: window.localStorage.getItem('token')
+                    }
+                )
+                console.log(response)
+                setLoading(false)
+            } catch (error) {
+                console.log(error)
+                router.push('/auth/login')
+            }
+        }
+        userVerifier()
+
+    }, [])
+    console.log(data)
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-full">
+                <div className="w-8 h-8 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+            </div>
+        );
     }
 
     return (

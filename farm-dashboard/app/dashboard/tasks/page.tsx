@@ -1,7 +1,7 @@
 'use client'
 import Link from "next/link"
 import { Plus } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import useSWR from "swr"
 
 import { Button } from "@/components/ui/button"
@@ -11,6 +11,8 @@ import { TasksList } from "@/components/dashboard/tasks/tasks-list"
 import { PaginatedFarmsResponse } from "../farms/FarmComponent"
 import { fetcher } from "@/lib/utils"
 import { JoinedTask } from "@/app/types/farm.types"
+import axiosInstance from "@/app/helper/axiosInstance"
+import { useRouter } from "next/navigation"
 
 export default function TasksPage() {
   const [page, setPage] = useState(1)
@@ -19,8 +21,35 @@ export default function TasksPage() {
     fetcher
 
   )
-
+  const router = useRouter()
   const totalPages = data?.count ? Math.ceil(data.count / data.results.length) : 1
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    async function userVerifier() {
+      try {
+        const response = await axiosInstance.post('/user/token/verify',
+          {
+            token: window.localStorage.getItem('token')
+          }
+        )
+        console.log(response)
+        setLoading(false)
+      } catch (error) {
+        console.log(error)
+        router.push('/auth/login')
+      }
+    }
+    userVerifier()
+
+  }, [])
+  console.log(data)
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="w-8 h-8 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">

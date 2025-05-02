@@ -50,6 +50,7 @@ export default function NewTaskPage() {
     `/farm/list/owner?limit=${100}`,
     fetcher
   )
+  const [loading, setLoading] = useState(true)
   const [fields, setFields] = useState<Field[]>([])
   const form = useForm<TaskFormValues>({
     resolver: zodResolver(taskSchema),
@@ -104,6 +105,32 @@ export default function NewTaskPage() {
       console.log(error)
       toast.error('error loading field data')
     }
+  }
+  useEffect(() => {
+    async function userVerifier() {
+      try {
+        const response = await axiosInstance.post('/user/token/verify',
+          {
+            token: window.localStorage.getItem('token')
+          }
+        )
+        console.log(response)
+        setLoading(false)
+      } catch (error) {
+        console.log(error)
+        router.push('/auth/login')
+      }
+    }
+    userVerifier()
+
+  }, [])
+  console.log(data)
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="w-8 h-8 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+      </div>
+    );
   }
 
   return (
