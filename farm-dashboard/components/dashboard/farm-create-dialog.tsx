@@ -11,14 +11,16 @@ import axiosInstance from '@/app/helper/axiosInstance';
 import { toast } from 'sonner';
 import { ToastStyles } from '@/lib/utils';
 
+export const MAX_FILE_SIZE = 300 * 1024; // 300 KB in bytes
+
 // Validation Schema
 const farmSchema = z.object({
     name: z.string().min(1, 'Farm name is required'),
     location: z.string().min(1, 'Location is required'),
     sizeInAcres: z.string().min(1, 'Size in acres must be greater than 0').optional(),
     description: z.string().min(1, 'Description is required'),
-    image: z.instanceof(File).refine(file => file.size > 0, {
-        message: 'Image is required',
+    image: z.instanceof(File).refine(file => file.size > 0 && file.size <= MAX_FILE_SIZE, {
+        message: 'Image is required and must be under 300 KB',
     }),
 });
 

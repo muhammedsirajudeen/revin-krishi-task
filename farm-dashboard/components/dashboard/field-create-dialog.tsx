@@ -22,6 +22,7 @@ import { useParams } from "next/navigation";
 import useSWR from "swr";
 import { PaginatedFarmsResponse } from "@/app/dashboard/farms/FarmComponent";
 import { User } from "./edit-task-dialog";
+import { MAX_FILE_SIZE } from "./farm-create-dialog";
 
 const fieldSchema = z.object({
     name: z.string().min(1, "Field name is required"),
@@ -30,7 +31,7 @@ const fieldSchema = z.object({
     description: z.string().optional(),
     image: z
         .custom<File>((file) => file instanceof File, "Image is required")
-        .refine((file) => file.size < 5 * 1024 * 1024, "Max image size is 5MB"),
+        .refine((file) => file.size < MAX_FILE_SIZE, "Max image size is 300 kb"),
 });
 
 type FieldFormData = z.infer<typeof fieldSchema>;
