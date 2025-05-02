@@ -5,6 +5,7 @@ Here’s a clean, professional, and comprehensive `README.md` for your Django (D
 # 🌾 Revin Krishi: Task Scheduling & Analytics Dashboard
 
 A full-stack agricultural project management platform designed for **Revin Techno Solutions Pvt. Ltd.** to help visualize, manage, and schedule farm-related projects and tasks.
+![image](https://github.com/user-attachments/assets/6b389b3e-2419-44a9-bfb7-1b5e405e10b9)
 
 Built with:
 - ⚙️ **Django REST Framework** (Backend)
