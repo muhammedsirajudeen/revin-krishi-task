@@ -10,6 +10,9 @@ import { StatsCards } from "@/components/dashboard/stats-cards"
 import useSWR from "swr"
 import { fetcher } from "@/lib/utils"
 import { JoinedTask } from "../types/farm.types"
+import { useEffect, useState } from "react"
+import axiosInstance from "../helper/axiosInstance"
+import { useRouter } from "next/navigation"
 
 export interface DashboardResponse {
   "farm": number,
@@ -24,8 +27,35 @@ export interface DashboardResponse {
 }
 
 export default function DashboardPage() {
+  const router = useRouter()
+  const [loading, setLoading] = useState(true)
+  useEffect(() => {
+    async function userVerifier() {
+      try {
+        const response = await axiosInstance.post('/user/token/verify',
+          {
+            token: window.localStorage.getItem('token')
+          }
+        )
+        console.log(response)
+        setLoading(false)
+      } catch (error) {
+        console.log(error)
+        router.push('/auth/login')
+      }
+    }
+    userVerifier()
+
+  }, [])
   const { data } = useSWR<DashboardResponse>('/farm/summary', fetcher)
   console.log(data)
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="w-8 h-8 border-4 border-blue-500 border-dashed rounded-full animate-spin"></div>
+      </div>
+    );
+  }
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between">

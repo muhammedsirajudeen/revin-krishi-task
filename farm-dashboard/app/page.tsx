@@ -2,6 +2,7 @@ import Link from "next/link"
 import { ArrowRight, BarChart3, Calendar, CheckCircle, Leaf, MapPin, Tractor } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import LoginComponent from "@/components/login-component"
 
 export default function LandingPage() {
   return (
@@ -13,7 +14,7 @@ export default function LandingPage() {
             <Leaf className="h-6 w-6 text-green-600" />
             <span className="text-xl font-bold">FarmDash</span>
           </div>
-          <nav className="hidden gap-6 md:flex">
+          <nav className="hidden gap-6 md:flex items-center justify-center">
             <Link href="#features" className="text-sm font-medium hover:underline">
               Features
             </Link>
@@ -23,15 +24,9 @@ export default function LandingPage() {
             <Link href="#pricing" className="text-sm font-medium hover:underline">
               Pricing
             </Link>
+            <LoginComponent />
           </nav>
-          <div className="flex items-center gap-4">
-            <Link href="/auth/login">
-              <Button variant="outline">Login</Button>
-            </Link>
-            <Link href="/auth/register">
-              <Button>Sign Up</Button>
-            </Link>
-          </div>
+
         </div>
       </header>
 

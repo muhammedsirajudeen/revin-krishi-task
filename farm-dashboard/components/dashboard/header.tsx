@@ -23,6 +23,7 @@ export default function DashboardHeader() {
   const [open, setOpen] = useState(false)
 
   const handleLogout = () => {
+    localStorage.removeItem('token')
     toast.success("Logged out successfully")
     router.push("/auth/login")
   }
