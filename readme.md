@@ -1,5 +1,3 @@
-Here’s a clean, professional, and comprehensive `README.md` for your Django (DRF) + Next.js + MongoDB assessment project for **Revin Techno Solutions**:
-
 ---
 
 # 🌾 Revin Krishi: Task Scheduling & Analytics Dashboard
@@ -78,7 +76,7 @@ revin-krishi/
 
 ## 📦 Installation
 
-### 🔙 Backend (DRF + MongoDB)
+### 🔙 Backend (DRF + Postgres)
 ```bash
 cd farm-backend
 python -m venv venv
